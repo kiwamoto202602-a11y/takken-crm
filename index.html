@@ -91,15 +91,16 @@ textarea{resize:vertical;min-height:65px;}
 .si{padding:7px 11px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;font-family:inherit;background:var(--bg);outline:none;transition:border .15s;width:200px;}
 .si:focus{border-color:var(--accent);background:var(--surface);}
 select.fs{padding:7px 9px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;font-family:inherit;background:var(--bg);color:var(--text1);cursor:pointer;outline:none;}
-/* detail panel */
-#dp{display:none;position:fixed;top:0;right:0;width:440px;height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:150;overflow:hidden;box-shadow:var(--shm);flex-direction:column;}
+/* detail modal (center) */
+#dp{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:150;align-items:center;justify-content:center;}
 #dp.open{display:flex;}
-#dp .dp-hd{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-#dp .dp-hd h2{font-size:14px;font-weight:600;}
+#dp .dp-inner{background:var(--surface);border-radius:var(--r);width:780px;max-width:96vw;height:88vh;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shm);}
+#dp .dp-hd{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+#dp .dp-hd h2{font-size:15px;font-weight:600;}
 .dp-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
-.dp-tab{flex:1;padding:9px 4px;font-size:12px;font-weight:500;text-align:center;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:all .15s;}
+.dp-tab{flex:1;padding:10px 4px;font-size:13px;font-weight:500;text-align:center;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:all .15s;}
 .dp-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
-.dp-body{flex:1;overflow-y:auto;padding:14px 18px;}
+.dp-body{flex:1;overflow-y:auto;padding:16px 22px;}
 .dp-sec{margin-bottom:16px;}
 .dp-sec h3{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
 .dp-row{display:flex;justify-content:space-between;margin-bottom:5px;}
@@ -215,8 +216,8 @@ select.fs{padding:7px 9px;border:1px solid var(--border);border-radius:var(--rs)
   .pg-grid{grid-template-columns:1fr;}
   .pc-img{height:80px;}
 
-  /* Detail panel: full screen */
-  #dp{width:100vw;border-left:none;}
+  /* Detail modal: full screen on mobile */
+  #dp .dp-inner{width:100%;max-width:100%;height:100dvh;border-radius:0;}
   #dp .dp-hd h2{font-size:13px;}
   .dp-tab{font-size:11px;padding:8px 2px;}
 
@@ -422,8 +423,9 @@ select.fs{padding:7px 9px;border:1px solid var(--border);border-radius:var(--rs)
   </div>
 </div>
 
-<!-- DEAL DETAIL PANEL -->
-<div id="dp">
+<!-- DEAL DETAIL MODAL -->
+<div id="dp" onclick="if(event.target===this)closeDP()">
+  <div class="dp-inner">
   <div class="dp-hd">
     <h2 id="dpTitle">案件詳細</h2>
     <div style="display:flex;gap:6px;">
@@ -452,23 +454,29 @@ select.fs{padding:7px 9px;border:1px solid var(--border);border-radius:var(--rs)
         </div>
         <div id="dpDeadline" style="font-size:11px;color:var(--text3);margin-top:4px;"></div>
       </div>
-      <div class="dp-sec"><h3>顧客情報</h3>
-        <div class="dp-row"><span class="dl">氏名</span><span class="dv" id="dv-cust"></span></div>
-        <div class="dp-row"><span class="dl">役割</span><span class="dv" id="dv-role"></span></div>
-        <div class="dp-row"><span class="dl">電話</span><span class="dv" id="dv-tel"></span></div>
-        <div class="dp-row"><span class="dl">メール</span><span class="dv" id="dv-email"></span></div>
-      </div>
-      <div class="dp-sec"><h3>物件情報</h3>
-        <div class="dp-row"><span class="dl">物件名</span><span class="dv" id="dv-prop"></span></div>
-        <div class="dp-row"><span class="dl">種別</span><span class="dv" id="dv-proptype"></span></div>
-        <div class="dp-row"><span class="dl">価格</span><span class="dv" id="dv-price"></span></div>
-        <div class="dp-row"><span class="dl">住所</span><span class="dv" id="dv-addr"></span></div>
-      </div>
-      <div class="dp-sec"><h3>案件情報</h3>
-        <div class="dp-row"><span class="dl">業務形態</span><span class="dv" id="dv-agency"></span></div>
-        <div class="dp-row"><span class="dl">取引種別</span><span class="dv" id="dv-dealtype"></span></div>
-        <div class="dp-row"><span class="dl">期限日</span><span class="dv" id="dv-deadline"></span></div>
-        <div class="dp-row"><span class="dl">備考</span><span class="dv" id="dv-memo"></span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <div class="dp-sec"><h3>顧客情報</h3>
+            <div class="dp-row"><span class="dl">氏名</span><span class="dv" id="dv-cust"></span></div>
+            <div class="dp-row"><span class="dl">役割</span><span class="dv" id="dv-role"></span></div>
+            <div class="dp-row"><span class="dl">電話</span><span class="dv" id="dv-tel"></span></div>
+            <div class="dp-row"><span class="dl">メール</span><span class="dv" id="dv-email"></span></div>
+          </div>
+          <div class="dp-sec"><h3>案件情報</h3>
+            <div class="dp-row"><span class="dl">業務形態</span><span class="dv" id="dv-agency"></span></div>
+            <div class="dp-row"><span class="dl">取引種別</span><span class="dv" id="dv-dealtype"></span></div>
+            <div class="dp-row"><span class="dl">期限日</span><span class="dv" id="dv-deadline"></span></div>
+            <div class="dp-row"><span class="dl">備考</span><span class="dv" id="dv-memo"></span></div>
+          </div>
+        </div>
+        <div>
+          <div class="dp-sec"><h3>物件情報</h3>
+            <div class="dp-row"><span class="dl">物件名</span><span class="dv" id="dv-prop"></span></div>
+            <div class="dp-row"><span class="dl">種別</span><span class="dv" id="dv-proptype"></span></div>
+            <div class="dp-row"><span class="dl">価格</span><span class="dv" id="dv-price"></span></div>
+            <div class="dp-row"><span class="dl">住所</span><span class="dv" id="dv-addr"></span></div>
+          </div>
+        </div>
       </div>
     </div>
     <div id="dp-check" class="dp-panel" style="display:none;">
@@ -496,7 +504,7 @@ select.fs{padding:7px 9px;border:1px solid var(--border);border-radius:var(--rs)
       </div>
       <div id="dpFileList"></div>
     </div>
-  </div>
+  </div><!-- /dp-inner -->
 </div>
 
 <!-- MODALS -->
