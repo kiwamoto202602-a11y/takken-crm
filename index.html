@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>宅建業 案件管理CRM</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Sans:wght@400;500;600&display=swap');
 :root {
@@ -664,10 +665,13 @@ select.fs{padding:7px 9px;border:1px solid var(--border);border-radius:var(--rs)
 // ============================================================
 // CONFIG
 // ============================================================
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
-const APP_PASS = 'kakuzen2026';
-const DEMO_MODE = SUPABASE_URL === 'YOUR_SUPABASE_URL';
+const SUPABASE_URL = 'https://izlsvpmrawbsuseuotwb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Y8MKLzP5bUqf-biAqO1TCA_4-upe2Sh';
+const DEMO_MODE = false;
+
+// Supabase クライアント初期化
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ============================================================
 // CONSTANTS
@@ -736,47 +740,61 @@ let customers=[], properties=[], deals=[], activities=[], tasks=[], checklists=[
 let currentDealId=null, currentDPTab='info';
 
 // ============================================================
-// SUPABASE HELPERS
+// SUPABASE HELPERS（SDK版）
 // ============================================================
-async function dbGet(t,q=''){
-  const r=await fetch(`${SUPABASE_URL}/rest/v1/${t}?${q}&order=created_at.desc`,{headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`}});
-  return r.json();
+async function dbGet(t, q={}){
+  let query = sb.from(t).select('*');
+  if(q.eq) Object.entries(q.eq).forEach(([k,v])=>{ query=query.eq(k,v); });
+  query = query.order('created_at', {ascending:false});
+  const {data,error} = await query;
+  if(error) console.error(t,error);
+  return data||[];
 }
 async function dbIns(t,d){
-  const r=await fetch(`${SUPABASE_URL}/rest/v1/${t}`,{method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(d)});
-  return r.json();
+  const {data,error} = await sb.from(t).insert(d).select();
+  if(error) console.error(t,error);
+  return data||[];
 }
 async function dbUpd(t,id,d){
-  await fetch(`${SUPABASE_URL}/rest/v1/${t}?id=eq.${id}`,{method:'PATCH',headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json'},body:JSON.stringify(d)});
+  const {error} = await sb.from(t).update(d).eq('id',id);
+  if(error) console.error(t,error);
 }
 async function dbDel(t,id){
-  await fetch(`${SUPABASE_URL}/rest/v1/${t}?id=eq.${id}`,{method:'DELETE',headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`}});
+  const {error} = await sb.from(t).delete().eq('id',id);
+  if(error) console.error(t,error);
 }
 async function dbUpsert(t,d,conflict){
-  const r=await fetch(`${SUPABASE_URL}/rest/v1/${t}?on_conflict=${conflict}`,{method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json','Prefer':'return=representation,resolution=merge-duplicates'},body:JSON.stringify(d)});
-  return r.json();
+  const {data,error} = await sb.from(t).upsert(d,{onConflict:conflict}).select();
+  if(error) console.error(t,error);
+  return data||[];
 }
 async function storageUpload(bucket,path,file){
-  const r=await fetch(`${SUPABASE_URL}/storage/v1/object/${bucket}/${path}`,{method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':file.type,'x-upsert':'true'},body:file});
-  return r.json();
+  const {data,error} = await sb.storage.from(bucket).upload(path,file,{upsert:true});
+  if(error) console.error(error);
+  return data;
 }
-function storageUrl(bucket,path){return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;}
+function storageUrl(bucket,path){
+  const {data} = sb.storage.from(bucket).getPublicUrl(path);
+  return data.publicUrl;
+}
 
 // ============================================================
-// AUTH
+// AUTH（Supabase Auth）
 // ============================================================
-function doLogin(){
-  const p=document.getElementById('lPass').value;
-  if(p===APP_PASS){
-    sessionStorage.setItem('crm_login','1');
-    document.getElementById('loginView').style.display='none';
-    document.getElementById('appShell').style.display='';
-    loadAll(); nav('dashboard');
-  } else {
-    document.getElementById('loginMsg').textContent='パスワードが正しくありません';
-  }
+async function doLogin(){
+  const email=document.getElementById('lEmail').value.trim();
+  const pass=document.getElementById('lPass').value;
+  const msg=document.getElementById('loginMsg');
+  msg.textContent='ログイン中…';
+  const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
+  if(error){msg.textContent='メールアドレスまたはパスワードが正しくありません';return;}
+  const userName=data.user?.user_metadata?.name||email;
+  document.getElementById('sfUser').textContent=userName;
+  document.getElementById('loginView').style.display='none';
+  document.getElementById('appShell').style.display='';
+  loadAll();nav('dashboard');
 }
-function doLogout(){sessionStorage.removeItem('crm_login');location.reload();}
+async function doLogout(){await sb.auth.signOut();location.reload();}
 
 // ============================================================
 // LOAD DATA
@@ -1562,13 +1580,18 @@ async function deleteAct(id){
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 
 // ============================================================
-// INIT
+// INIT（Supabase Auth セッション確認）
 // ============================================================
-if(sessionStorage.getItem('crm_login')==='1'){
-  document.getElementById('loginView').style.display='none';
-  document.getElementById('appShell').style.display='';
-  loadAll();nav('dashboard');
-}
+(async()=>{
+  const {data:{session}} = await sb.auth.getSession();
+  if(session){
+    const userName=session.user?.user_metadata?.name||session.user?.email||'';
+    document.getElementById('sfUser').textContent=userName;
+    document.getElementById('loginView').style.display='none';
+    document.getElementById('appShell').style.display='';
+    loadAll();nav('dashboard');
+  }
+})();
 
 /*
 ============================================================
