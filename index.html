@@ -1609,11 +1609,12 @@ function renderActs(){
     const d=deals.find(x=>x.id===a.deal_id);
     const c=customers.find(x=>x.id===d?.customer_id);
     const p=properties.find(x=>x.id===d?.property_id);
-    return `<tr>
+    const clickable=d?`onclick="openDP(${d.id})" style="cursor:pointer;" title="案件詳細を開く"`:'';
+    return `<tr ${clickable}>
       <td data-label="日時" class="t2">${a.date||'—'}</td>
       <td data-label="種類"><span class="badge ${typeColors[a.type]||'bg-gray'}">${a.type}</span></td>
-      <td data-label="顧客">${c?c.sei+' '+c.mei:'—'}</td>
-      <td data-label="案件" class="t2">${p?.name||'—'}</td>
+      <td data-label="顧客">${c?`<strong>${c.sei} ${c.mei}</strong>`:'—'}</td>
+      <td data-label="案件">${d?`<span class="badge ${STAGE_COLORS[d.stage]||'bg-gray'}" style="margin-right:4px;">${d.stage}</span><span class="t2" style="font-size:12px;">${p?.name||'—'}</span>`:'—'}</td>
       <td data-label="内容">${a.note||'—'}</td>
       <td data-label="担当" class="t2">${a.staff||'—'}</td>
     </tr>`;
