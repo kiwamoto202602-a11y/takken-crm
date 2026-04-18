@@ -1244,7 +1244,7 @@ function openDealModal(id) {
   document.getElementById('did').value = id||'';
   document.getElementById('dealModalTitle').textContent = d?'案件を編集':'案件を作成';
   const custSel = document.getElementById('dCustId');
-  custSel.innerHTML = '<option value="">顧客を選択…</option>'+customers.map(c => `<option value="${c.id}" ${d?.customer_id===c.id?'selected':''}>${c.sei} ${c.mei}（${c.role|）</option>`).join('');
+  custSel.innerHTML = '<option value="">顧客を選択…</option>'+customers.map(c => `<option value="${c.id}" ${d?.customer_id===c.id?'selected':''}>${c.sei} ${c.mei}（${c.role}）</option>`).join('');
   const propSel = document.getElementById('dPropId');
   propSel.innerHTML = '<option value="">物件を選択…</option>'+properties.map(p => `<option value="${p.id}" ${d?.property_id===p.id?'selected':''}>${p.name}</option>`).join('');
   document.getElementById('dAgency').value = d?.agency_type||'専任媒介';
