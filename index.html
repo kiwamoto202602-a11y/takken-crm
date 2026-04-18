@@ -553,148 +553,7 @@ select.fs{padding:7px 9px;border:1px solid var(--border);border-radius:var(--rs)
 
 <!-- MODALS -->
 <!-- 案件作成/編集 -->
-<div class="modal-ov" id="dealModal">
-  <div class="modal">
-    <div class="modal-title" id="dealModalTitle">案件を作成</div>
-    <input type="hidden" id="did">
-    <div class="fr">
-      <div><label>顧客</label>
-        <select id="dCustId"><option value="">顧客を選択…</option></select>
-      </div>
-      <div><label>物件</label>
-        <select id="dPropId"><option value="">物件を選択…</option></select>
-      </div>
-    </div>
-    <div class="fr">
-      <div><label>業務形態</label>
-        <select id="dAgency">
-          <option value="専任媒介">専任媒介</option>
-          <option value="専属専任媒介">専属専任媒介</option>
-          <option value="一般媒介">一般媒介</option>
-          <option value="仲介（片手）">仲介（片手）</option>
-          <option value="仲介（両手）">仲介（両手）</option>
-        </select>
-      </div>
-      <div><label>期限日</label><input type="date" id="dDeadline"></div>
-    </div>
-    <div class="fr full"><div><label>備考</label><textarea id="dMemo" placeholder="案件の概要・特記事項など"></textarea></div></div>
-    <div class="mf">
-      <button class="btn btn-s" onclick="closeModal('dealModal')">キャンセル</button>
-      <button class="btn btn-p" onclick="saveDeal()">保存</button>
-    </div>
-  </div>
-</div>
 
-<!-- 顧客作成/編集 -->
-<div class="modal-ov" id="custModal">
-  <div class="modal">
-    <div class="modal-title" id="custModalTitle">顧客を追加</div>
-    <input type="hidden" id="cid">
-    <div class="fr">
-      <div><label>姓</label><input type="text" id="cSei" placeholder="田中"></div>
-      <div><label>名</label><input type="text" id="cMei" placeholder="花子"></div>
-    </div>
-    <div class="fr">
-      <div><label>電話</label><input type="tel" id="cTel" placeholder="090-0000-0000"></div>
-      <div><label>メール</label><input type="email" id="cEmail" placeholder="hanako@example.com"></div>
-    </div>
-    <div class="fr">
-      <div><label>役割</label>
-        <select id="cRole"><option value="買主">買主</option><option value="売主">売主</option><option value="両方">両方</option></select>
-      </div>
-      <div><label>予算・希望条件</label><input type="text" id="cBudget" placeholder="3,000万円・3LDK希望"></div>
-    </div>
-    <div class="fr full"><div><label>備考</label><textarea id="cMemo" placeholder="要望・特記事項など"></textarea></div></div>
-    <div class="mf">
-      <button class="btn btn-s" onclick="closeModal('custModal')">キャンセル</button>
-      <button class="btn btn-p" onclick="saveCust()">保存</button>
-    </div>
-  </div>
-</div>
-
-<!-- 物件作成/編集 -->
-<div class="modal-ov" id="propModal">
-  <div class="modal">
-    <div class="modal-title" id="propModalTitle">物件を追加</div>
-    <input type="hidden" id="pid">
-    <div class="fr">
-      <div><label>物件名</label><input type="text" id="pName" placeholder="〇〇マンション101"></div>
-      <div><label>物件種別</label>
-        <select id="pPropType" onchange="togglePropFields()">
-          <option value="区分">区分（マンション等）</option>
-          <option value="建物">建物（一戸建て等）</option>
-          <option value="土地">土地</option>
-          <option value="土地+建物">土地+建物</option>
-        </select>
-      </div>
-    </div>
-    <div class="fr full"><div><label>住所</label><input type="text" id="pAddr" placeholder="愛知県名古屋市中区…"></div></div>
-    <div class="fr">
-      <div><label>取引種別</label>
-        <select id="pDealType"><option value="売買">売買</option><option value="賃貸">賃貸</option></select>
-      </div>
-      <div><label>価格</label><input type="text" id="pPrice" placeholder="3,500万円 / 8万円/月"></div>
-    </div>
-    <div id="propBldgFields">
-      <div class="fr tri">
-        <div><label>面積</label><input type="text" id="pArea" placeholder="65㎡"></div>
-        <div><label>築年数</label><input type="text" id="pAge" placeholder="築10年"></div>
-        <div><label>間取り</label><input type="text" id="pLayout" placeholder="3LDK"></div>
-      </div>
-    </div>
-    <div class="fr">
-      <div><label>状況</label>
-        <select id="pStatus"><option value="募集中">募集中</option><option value="商談中">商談中</option><option value="成約">成約</option></select>
-      </div>
-      <div></div>
-    </div>
-    <div class="fr full"><div><label>備考</label><textarea id="pMemo" placeholder="特徴・注意事項など"></textarea></div></div>
-    <div class="mf">
-      <button class="btn btn-s" onclick="closeModal('propModal')">キャンセル</button>
-      <button class="btn btn-p" onclick="saveProp()">保存</button>
-    </div>
-  </div>
-</div>
-
-<!-- タスク追加 -->
-<div class="modal-ov" id="taskModal">
-  <div class="modal sm">
-    <div class="modal-title">タスクを追加</div>
-    <input type="hidden" id="taskDealId">
-    <div class="fr full"><div><label>タスク内容</label><input type="text" id="tTitle" placeholder="やること…"></div></div>
-    <div class="fr">
-      <div><label>期限日</label><input type="date" id="tDue"></div>
-      <div><label>優先度</label>
-        <select id="tPri"><option value="高">高</option><option value="中">中</option><option value="低">低</option></select>
-      </div>
-    </div>
-    <div class="fr full"><div><label>担当者</label><input type="text" id="tAssign" placeholder="岩本"></div></div>
-    <div class="mf">
-      <button class="btn btn-s" onclick="closeModal('taskModal')">キャンセル</button>
-      <button class="btn btn-p" onclick="saveTask()">追加</button>
-    </div>
-  </div>
-</div>
-
-<!-- 活動記録追加 -->
-<div class="modal-ov" id="actModal">
-  <div class="modal sm">
-    <div class="modal-title">活動を記録</div>
-    <input type="hidden" id="actDealId">
-    <div class="fr">
-      <div><label>種類</label>
-        <select id="aType"><option value="電話">電話</option><option value="来店">来店</option><option value="内見">内見</option><option value="メール">メール</option><option value="その他">その他</option></select>
-      </div>
-      <div><label>日付</label><input type="date" id="aDate"></div>
-    </div>
-    <div class="fr full"><div><label>内容</label><textarea id="aNote" placeholder="対応内容・メモ…"></textarea></div></div>
-    <div class="fr full"><div><label>担当者</label><input type="text" id="aStaff" placeholder="岩本"></div></div>
-    <div class="mf">
-      <button class="btn btn-s" onclick="closeModal('actModal')">キャンセル</button>
-      <button class="btn btn-p" onclick="saveAct()">保存</button>
-    </div>
-  </div>
-</div>
 
 <!-- ステージ変更 -->
 <div class="modal-ov" id="stageModal">
@@ -1607,5 +1466,148 @@ auth.onAuthStateChanged(user => {
   }
 });
 </script>
+
+<div class="modal-ov" id="dealModal">
+  <div class="modal">
+    <div class="modal-title" id="dealModalTitle">案件を作成</div>
+    <input type="hidden" id="did">
+    <div class="fr">
+      <div><label>顧客</label>
+        <select id="dCustId"><option value="">顧客を選択…</option></select>
+      </div>
+      <div><label>物件</label>
+        <select id="dPropId"><option value="">物件を選択…</option></select>
+      </div>
+    </div>
+    <div class="fr">
+      <div><label>業務形態</label>
+        <select id="dAgency">
+          <option value="専任媒介">専任媒介</option>
+          <option value="専属専任媒介">専属専任媒介</option>
+          <option value="一般媒介">一般媒介</option>
+          <option value="仲介（片手）">仲介（片手）</option>
+          <option value="仲介（両手）">仲介（両手）</option>
+        </select>
+      </div>
+      <div><label>期限日</label><input type="date" id="dDeadline"></div>
+    </div>
+    <div class="fr full"><div><label>備考</label><textarea id="dMemo" placeholder="案件の概要・特記事項など"></textarea></div></div>
+    <div class="mf">
+      <button class="btn btn-s" onclick="closeModal('dealModal')">キャンセル</button>
+      <button class="btn btn-p" onclick="saveDeal()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 顧客作成/編集 -->
+<div class="modal-ov" id="custModal">
+  <div class="modal">
+    <div class="modal-title" id="custModalTitle">顧客を追加</div>
+    <input type="hidden" id="cid">
+    <div class="fr">
+      <div><label>姓</label><input type="text" id="cSei" placeholder="田中"></div>
+      <div><label>名</label><input type="text" id="cMei" placeholder="花子"></div>
+    </div>
+    <div class="fr">
+      <div><label>電話</label><input type="tel" id="cTel" placeholder="090-0000-0000"></div>
+      <div><label>メール</label><input type="email" id="cEmail" placeholder="hanako@example.com"></div>
+    </div>
+    <div class="fr">
+      <div><label>役割</label>
+        <select id="cRole"><option value="買主">買主</option><option value="売主">売主</option><option value="両方">両方</option></select>
+      </div>
+      <div><label>予算・希望条件</label><input type="text" id="cBudget" placeholder="3,000万円・3LDK希望"></div>
+    </div>
+    <div class="fr full"><div><label>備考</label><textarea id="cMemo" placeholder="要望・特記事項など"></textarea></div></div>
+    <div class="mf">
+      <button class="btn btn-s" onclick="closeModal('custModal')">キャンセル</button>
+      <button class="btn btn-p" onclick="saveCust()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 物件作成/編集 -->
+<div class="modal-ov" id="propModal">
+  <div class="modal">
+    <div class="modal-title" id="propModalTitle">物件を追加</div>
+    <input type="hidden" id="pid">
+    <div class="fr">
+      <div><label>物件名</label><input type="text" id="pName" placeholder="〇〇マンション101"></div>
+      <div><label>物件種別</label>
+        <select id="pPropType" onchange="togglePropFields()">
+          <option value="区分">区分（マンション等）</option>
+          <option value="建物">建物（一戸建て等）</option>
+          <option value="土地">土地</option>
+          <option value="土地+建物">土地+建物</option>
+        </select>
+      </div>
+    </div>
+    <div class="fr full"><div><label>住所</label><input type="text" id="pAddr" placeholder="愛知県名古屋市中区…"></div></div>
+    <div class="fr">
+      <div><label>取引種別</label>
+        <select id="pDealType"><option value="売買">売買</option><option value="賃貸">賃貸</option></select>
+      </div>
+      <div><label>価格</label><input type="text" id="pPrice" placeholder="3,500万円 / 8万円/月"></div>
+    </div>
+    <div id="propBldgFields">
+      <div class="fr tri">
+        <div><label>面積</label><input type="text" id="pArea" placeholder="65㎡"></div>
+        <div><label>築年数</label><input type="text" id="pAge" placeholder="築10年"></div>
+        <div><label>間取り</label><input type="text" id="pLayout" placeholder="3LDK"></div>
+      </div>
+    </div>
+    <div class="fr">
+      <div><label>状況</label>
+        <select id="pStatus"><option value="募集中">募集中</option><option value="商談中">商談中</option><option value="成約">成約</option></select>
+      </div>
+      <div></div>
+    </div>
+    <div class="fr full"><div><label>備考</label><textarea id="pMemo" placeholder="特徴・注意事項など"></textarea></div></div>
+    <div class="mf">
+      <button class="btn btn-s" onclick="closeModal('propModal')">キャンセル</button>
+      <button class="btn btn-p" onclick="saveProp()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- タスク追加 -->
+<div class="modal-ov" id="taskModal">
+  <div class="modal sm">
+    <div class="modal-title">タスクを追加</div>
+    <input type="hidden" id="taskDealId">
+    <div class="fr full"><div><label>タスク内容</label><input type="text" id="tTitle" placeholder="やること…"></div></div>
+    <div class="fr">
+      <div><label>期限日</label><input type="date" id="tDue"></div>
+      <div><label>優先度</label>
+        <select id="tPri"><option value="高">高</option><option value="中">中</option><option value="低">低</option></select>
+      </div>
+    </div>
+    <div class="fr full"><div><label>担当者</label><input type="text" id="tAssign" placeholder="岩本"></div></div>
+    <div class="mf">
+      <button class="btn btn-s" onclick="closeModal('taskModal')">キャンセル</button>
+      <button class="btn btn-p" onclick="saveTask()">追加</button>
+    </div>
+  </div>
+</div>
+
+<!-- 活動記録追加 -->
+<div class="modal-ov" id="actModal">
+  <div class="modal sm">
+    <div class="modal-title">活動を記録</div>
+    <input type="hidden" id="actDealId">
+    <div class="fr">
+      <div><label>種類</label>
+        <select id="aType"><option value="電話">電話</option><option value="来店">来店</option><option value="内見">内見</option><option value="メール">メール</option><option value="その他">その他</option></select>
+      </div>
+      <div><label>日付</label><input type="date" id="aDate"></div>
+    </div>
+    <div class="fr full"><div><label>内容</label><textarea id="aNote" placeholder="対応内容・メモ…"></textarea></div></div>
+    <div class="fr full"><div><label>担当者</label><input type="text" id="aStaff" placeholder="岩本"></div></div>
+    <div class="mf">
+      <button class="btn btn-s" onclick="closeModal('actModal')">キャンセル</button>
+      <button class="btn btn-p" onclick="saveAct()">保存</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
