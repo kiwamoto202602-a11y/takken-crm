@@ -147,7 +147,7 @@ select.fs{padding:7px 9px;border:1px solid var(--border);border-radius:var(--rs)
 .pc-img{height:110px;background:var(--bg2);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:11px;}
 .pc-body{padding:11px 13px;}
 .pc-name{font-size:13px;font-weight:600;margin-bottom:3px;}
-.pc-addr{font-size:11px;color:var(--text2);margin-bottom:6px;white-space:nowraw;overflow:hidden;text-overflow:ellipsis;}
+.pc-addr{font-size:11px;color:var(--text2);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .pc-price{font-size:14px;font-weight:700;color:var(--accent);}
 .pc-meta{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap;}
 /* login */
@@ -353,11 +353,11 @@ select.fs{padding:7px 9px;border:1px solid var(--border);border-radius:var(--rs)
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
           <div class="today-tasks" id="todayTasksBox">
             <h3>今日のタスク・期限切れ</h3>
-            <div id="todayTasksList"><div class="empty" style="padding:12px;">タスクはあ㊊ません</div></div>
+            <div id="todayTasksList"><div class="empty" style="padding:12px;">タスクはありません</div></div>
           </div>
           <div class="today-tasks">
             <h3>最近の更新案件</h3>
-            <div id="recentDealsList"><div class="empty" style="padding:12px;">案件はありませこ</div></div>
+            <div id="recentDealsList"><div class="empty" style="padding:12px;">案件はありません</div></div>
           </div>
         </div>
         <div class="sec-hd"><h2>ステージ別案件数</h2></div>
@@ -370,10 +370,10 @@ select.fs{padding:7px 9px;border:1px solid var(--border);border-radius:var(--rs)
           <input class="si" placeholder="顧客名・物件名で検索…" id="dealSearch" oninput="renderDeals()">
           <select class="fs" id="dealStageFilter" onchange="renderDeals()">
             <option value="">全ステージ</option>
-            <option value="done">成約・失注み</option>
+            <option value="done">成約・失注のみ</option>
           </select>
           <select class="fs" id="dealTypeFilter" onchange="renderDeals()">
-            <option value="">"">全種別</option>
+            <option value="">全種別</option>
             <option value="売買">売買</option>
             <option value="賃貸">賃貸</option>
           </select>
@@ -877,7 +877,7 @@ function nav(v) {
   document.getElementById(`view-${v}`).classList.add('active');
   document.getElementById(`nav-${v}`)?.classList.add('active');
   document.getElementById(`bnav-${v}`)?.classList.add('active');
-  const titles = {dashboard:'ダビシャボード',deals:'案件管理',customers:'顧客管理',properties:'物件管理',tasks:'タスク管理',activities:'活動記録'};
+  const titles = {dashboard:'ダッシュボード',deals:'案件管理',customers:'顧客管理',properties:'物件管理',tasks:'タスク管理',activities:'活動記録'};
   document.getElementById('tbTitle').textContent = titles[v] || '';
   const adds = {deals:true,customers:true,properties:true};
   document.getElementById('tbAdd').style.display = adds[v] ? '' : 'none';
@@ -1041,133 +1041,172 @@ function openDP(id) {
   document.getElementById('dpStageNav').innerHTML = navPrev+navCurr+navNext;
   if(d.deadline) {
     const diff = Math.ceil((new Date(d.deadline)-new Date())/(1000*60*60*24));
-    const col = diff<0?'var(--danger)':diff<7?'var(--warn)':'var(--text3)';
-    document.getElementById('dpDeadline').innerHTML = `<span style="color:${col};">期限: ${d.deadline}（${diff<0?Math.abs(diff)+'日z-�z`c�Ή������Y������I�{�"O��[��H[�H���[Y[���][[Y[��RY
-	�XY[�I�K�^�۝[�I��'�fd9�*�*+yk����B���[Y[���][[Y[��RY
-	��X�\�	�K�^�۝[�H��	�˜�Z_H	�˛YZ_X���%	���[Y[���][[Y[��RY
-	��\��I�K�[��\�SH���[��\��H��Y�H��X�YH���˜��_O��[�����%	���[Y[���][[Y[��RY
-	��][	�K�^�۝[�H�˝[	��%	���[Y[���][[Y[��RY
-	��Y[XZ[	�K�^�۝[�H�˙[XZ[	��%	���[Y[���][[Y[��RY
-	��\��	�K�^�۝[�H˛�[Y_	��%	���[Y[���][[Y[��RY
-	��\��\I�K�^�۝[�H�	�����\_H�	��X[�\_X���%	���[Y[���][[Y[��RY
-	��\�X�I�K�^�۝[�H˜�X�_	��%	���[Y[���][[Y[��RY
-	��XY��K�^�۝[�H˘Y�	��%	���[Y[���][[Y[��RY
-	��XY�[��I�K�^�۝[�H�Y�[��W�\_	��%	���[Y[���][[Y[��RY
-	��YX[\I�K�^�۝[�H˙X[�\_	��%	���[Y[���][[Y[��RY
-	��YXY[�I�K�^�۝[�H�XY[�_	��*�*+yk�����[Y[���][[Y[��RY
-	��[Y[[��K�^�۝[�H�Y[[�	��%	���[Y[���][[Y[��RY
-	�	�K��\��\��Y
-	��[��NX��\��[�X�NB��[��[ۈ���Q
+    const col = diff<0?'var(--danger)':diff<=7?'var(--warn)':'var(--text3)';
+    document.getElementById('dpDeadline').innerHTML = `<span style="color:${col};">期限: ${d.deadline}（${diff<0?Math.abs(diff)+'日超過':'残'+diff+'日'}）</span>`;
+  } else { document.getElementById('dpDeadline').textContent='期限未設定'; }
+  document.getElementById('dv-cust').textContent = c?`${c.sei} ${c.mei}`:'—';
+  document.getElementById('dv-role').innerHTML = c?`<span class="badge bg-blue">${c.role}</span>`:'—';
+  document.getElementById('dv-tel').textContent = c?.tel||'—';
+  document.getElementById('dv-email').textContent = c?.email||'—';
+  document.getElementById('dv-prop').textContent = p?.name||'—';
+  document.getElementById('dv-proptype').textContent = p?`${p.prop_type} / ${p.deal_type}`:'—';
+  document.getElementById('dv-price').textContent = p?.price||'—';
+  document.getElementById('dv-addr').textContent = p?.addr||'—';
+  document.getElementById('dv-agency').textContent = d.agency_type||'—';
+  document.getElementById('dv-dealtype').textContent = p?.deal_type||'—';
+  document.getElementById('dv-deadline').textContent = d.deadline||'未設定';
+  document.getElementById('dv-memo').textContent = d.memo||'—';
+  document.getElementById('dp').classList.add('open');
+  dpTab(currentDPTab);
+}
+function closeDP() { document.getElementById('dp').classList.remove('open'); currentDealId=null; }
 
-H���[Y[���][[Y[��RY
-	�	�K��\��\���[[ݙJ	��[��N��\��[�X[Y[�[�B���[��[ۈX�
-H�\��[�X�H��[Y[��]Y\�T�[X�ܐ[
-	˙]X��K��ܑXX�
+function dpTab(t) {
+  currentDPTab = t;
+  document.querySelectorAll('.dp-tab').forEach((el,i) => {
+    el.classList.toggle('active',['info','check','tasks','acts','files'][i]===t);
+  });
+  document.querySelectorAll('.dp-panel').forEach(el => el.style.display='none');
+  document.getElementById(`dp-${t}`).style.display='';
+  if(t==='check') renderDPCheck();
+  if(t==='tasks') renderDPTasks();
+  if(t==='acts') renderDPActs();
+  if(t==='files') renderDPFiles();
+}
 
-[JHO�[��\��\�����J	�X�]�I���[����	��X���	�\����	�X���	ٚ[\��V�WOOO]
-NJN��[Y[��]Y\�T�[X�ܐ[
-	˙\[�[	�K��ܑXX�
-[O�[��[K�\�^OIۛۙI�N��[Y[���][[Y[��RY
-I�X
-K��[K�\�^OI��Y�OOI��X���H�[�\��X��
-NY�OOI�\����H�[�\�\���
-NY�OOI�X���H�[�\�X��
-NY�OOIٚ[\��H�[�\��[\�
-NB�����P��T���[��[ۈ�[�\��X��
-H�ۜ�HX[˙�[�
-O��YOOX�\��[�X[Y
-N�Y�Y
-H�]\���ۜ�][\�H��TPS��V���Y�W_�N�ۜ�]\�[��X��H][\˙�[\�HO�K��\H	��X�X��\�˙�[�
-�O�˙X[�YOOY�Y	��˚][W��^OOOZK��^H	��˘�X��Y
-JN][H	��Y�]\�[��X�˛[��
-H[
-�H]��\��H��\��X�����yb�yk�o�8�c	�]\�[��X�˛[��y.���*�k�9.���i��fx� ��(x�k��x����8�8�j�`,��9bcx�j�k�9.���e��i��c��h8�ex�a8� ��]��[
-�H]��[OH��۝\�^�N�L\���܎��\�K]^�N�X\��[�X���N�ȏ���g*8�k��x����8�;�&���ۙ��[OH���܎��\�K]^JNȏ����Y�_O���ۙϏ�]��Y�Z][\˛[��
-H�[
-�I�]��[OH��۝\�^�N�L����܎��\�K]^�Nȏ��d��k��x����8�8�k���x�������h!y���k��`�ࢸ�o��f����]����B�[�H[
-�H	�]����][\˛X\
-HO��ۜ���H�X��\�˙�[�
-�O�˙X[�YOOY�Y	��˚][W��^OOOZK��^JN�ۜ��X��YH��˘�X��Y�[�N�ۜ��HH��˘�X��Y؞O�;�"	��˘�X��Y؞_{�"X����]\��]��\��H���Z][H���[�]\OH��X�؛��	��X��Y���X��Y	Ή��Hۘ�[��OH����P�X��	��K��^_I�	����Y�_I�\˘�X��Y
-H����[��\��H��\K]Y�	�K��\O�ܙ\K[]\�	Ήܙ\K\�X��H���K��\O���yb�IΉ���9ij	�O��[����[��\��H���]���K�^I��X��Y��[��[OH��۝\�^�N�L���܎��\�K]^�Nȏ�8�$�؞_O��[�����O��[����]��JK���[�	��J���]���B��ۜ�\��Y�\�H�Q�T˜�X�J�Q�T˚[�^ي��Y�JJNY�\��Y�\˛[��
-H[
-�H]��[OH�X\��[�]��Mȏ�]��[OH��۝\�^�N�Lٛ۝]�ZY������܎��\�K]^�N�^]�[�ٛܛN�\\��\�N�]\�\�X�[�΋�
-�[N�X\��[�X���N�ȏ�`c�c���k��x����8�9论*�O�]��\��Y�\˙�ܑXX�
-�O��ۜ��HH��TPS��V��_�N�ۜ�ۙHH�K��[\�HO��X��\�˙�[�
-�O�˙X[�YOOY�Y	��˚][W��^OOOZK��^H	��˘�X��Y
-JK�[��[
-�H]��[OH��۝\�^�N�L����܎��\�K]^�N�Y[�Ό�ȏ���{�&��ۙ_K���K�[��H9k�9.���]��JN[
-�H	��]���B���[Y[���][[Y[��RY
-	��X���۝[�	�K�[��\�SH[B��\�[���[��[ۈ���P�X���^K�Y�K�X��Y
-H�ۜ�HX[˙�[�
-O��YOOX�\��[�X[Y
-N�Y�Y
-H�]\���ۜ�]HH�X[�Y��Y�Y�K][W��^N��^K�X��Y�X��Y؞N��l�y�+	��X��Y�]��]�]J
-K��T����[��
-_N]�Z]�\�\�
-	�X[��X��\�	�]K	�X[�Y][W��^I�N�X��\��H]�Z]��]
-	�X[��X��\�	�N�[�\��X��
-N��[�\�X[�
-NB����T���[��[ۈ�[�\�\���
-H�ۜ�\�H\��˙�[\�O��X[�YOOX�\��[�X[Y
-K��ܝ
+// CHECKLIST
+function renderDPCheck() {
+  const d = deals.find(x => x.id===currentDealId); if(\!d) return;
+  const items = COMPLIANCE[d.stage]||[];
+  const mustUncheck = items.filter(i => i.req && \!checklists.find(c => c.deal_id===d.id && c.item_key===i.key && c.checked));
+  let html = '';
+  if(mustUncheck.length) html += `<div class="warn-box">義務対応が${mustUncheck.length}件未完了です。次のステージに進む前に完了してください。</div>`;
+  html += `<div style="font-size:11px;color:var(--text3);margin-bottom:8px;">現在のステージ：<strong style="color:var(--text1);">${d.stage}</strong></div>`;
+  if(\!items.length) { html+='<div style="font-size:12px;color:var(--text3);">このステージのチェック項目はありません</div>'; }
+  else {
+    html += '<div>'+items.map(i => {
+      const chk = checklists.find(c => c.deal_id===d.id && c.item_key===i.key);
+      const checked = chk?.checked||false;
+      const by = chk?.checked_by?`（${chk.checked_by}）`:'';
+      return `<div class="chk-item">
+        <input type="checkbox" ${checked?'checked':''} onchange="toggleCheck('${i.key}','${d.stage}',this.checked)">
+        <span class="req-tag ${i.req?'req-must':'req-rec'}">${i.req?'義務':'推奨'}</span>
+        <span class="chk-txt">${i.text}${checked?`<span style="font-size:10px;color:var(--text3);"> ✓${by}</span>`:''}</span>
+      </div>`;
+    }).join('')+'</div>';
+  }
+  const pastStages = STAGES.slice(0,STAGES.indexOf(d.stage));
+  if(pastStages.length) {
+    html += `<div style="margin-top:14px;"><div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">過去のステージ確認</div>`;
+    pastStages.forEach(s => {
+      const si = COMPLIANCE[s]||[];
+      const done = si.filter(i => checklists.find(c => c.deal_id===d.id && c.item_key===i.key && c.checked)).length;
+      html += `<div style="font-size:12px;color:var(--text2);padding:3px 0;">${s}：${done}/${si.length} 完了</div>`;
+    });
+    html += '</div>';
+  }
+  document.getElementById('dpCheckContent').innerHTML = html;
+}
 
-K�HO��]�]JK�YW�]JK[�]�]J��YW�]JJN�ۜ�[H��[Y[���][[Y[��RY
-	�\��\�	�NY�[\��[��
-H�[�[��\�SI�]��[OH��۝\�^�N�L����܎��\�K]^�Nȏ����x���k��`�ࢸ�o��f����]�����]\���B�[�[��\�SH\��X\
-O��ۜ�YHH�YW�]Oۙ]�]J�YW�]JN��[�ۜ�Y��HYO�X]��Z[
+async function toggleCheck(key, stage, checked) {
+  const d = deals.find(x => x.id===currentDealId); if(\!d) return;
+  const data = {deal_id:d.id, stage, item_key:key, checked, checked_by:'岩本', checked_at:new Date().toISOString()};
+  await dbUpsert('deal_checklist', data, 'deal_id,item_key');
+  checklists = await dbGet('deal_checklist');
+  renderDPCheck(); renderDeals();
+}
 
-YK[�]�]J
-JK�L
-��
-��
-��
-JN��[�ۜ�YP��HY��OO[�[��ΙY������܎��\�KY[��\�IΙY��L�����܎��\�K]�\��IΉ���܎��\�K]^�I��ۜ�YSX�[HY��OO[�[��ΙY���	�X]�X��Y��_y��z-�z`c��Y��OOL��.⹥�IΉ��`��j	��Y������I��]\��]��\��H�\��Z][H	��ۙO��ۙKZ][IΉ��H���[�]\OH��X�؛��	��ۙO���X��Y	Ή��Hۘ�[��OH����U\��	���YI�\˘�X��Y
-H���]��[OH��^�Nȏ��]��\��H�\��]]H����]_O�]���]��\��H�\��[Y]H����[��\��H��Y�H	��W���Ԕ����[ܚ]W_	ؙ�Yܘ^I�H��[OH�X\��[�\�Y��ȏ����[ܚ]_O��[���	��YW�]O��[��[OH��۝\�^�N�L��YP��H����YW�]_H	�YSX�[O��[�����B�	��\��YۙY����[��[OH��۝\�^�N�L���܎��\�K]^�N�X\��[�[Y��ȏ���\��YۙY��O��[�����B��]����]����]ۈ�\��H�����Y��\�H�ۘ�X��H�[]U\��	���YI�H��[OH��^\��[�Όȏ�bb�fi؝]ۏ���]��JK���[�	��NB����P�U�UQT�[��[ۈ�[�\�X��
-H�ۜ�\�HX�]�]Y\˙�[\�HO�K�X[�YOOX�\��[�X[Y
-K��ܝ
+// TASKS
+function renderDPTasks() {
+  const list = tasks.filter(t => t.deal_id===currentDealId).sort((a,b) => new Date(a.due_date)-new Date(b.due_date));
+  const el = document.getElementById('dpTaskList');
+  if(\!list.length) { el.innerHTML='<div style="font-size:12px;color:var(--text3);">タスクはありません</div>'; return; }
+  el.innerHTML = list.map(t => {
+    const due = t.due_date?new Date(t.due_date):null;
+    const diff = due?Math.ceil((due-new Date())/(1000*60*60*24)):null;
+    const dueCls = diff===null?'':diff<0?'color:var(--danger)':diff<=3?'color:var(--warn)':'color:var(--text3)';
+    const dueLabel = diff===null?'':diff<0?`${Math.abs(diff)}日超過`:diff===0?'今日':'あと'+diff+'日';
+    return `<div class="task-item ${t.done?'done-item':''}">
+      <input type="checkbox" ${t.done?'checked':''} onchange="toggleTask('${t.id}',this.checked)">
+      <div style="flex:1;">
+        <div class="task-title">${t.title}</div>
+        <div class="task-meta">
+          <span class="badge ${PRI_COLORS[t.priority]||'bg-gray'}" style="margin-right:4px;">${t.priority}</span>
+          ${t.due_date?`<span style="font-size:10px;${dueCls}">${t.due_date} ${dueLabel}</span>`:''}
+          ${t.assigned_to?`<span style="font-size:10px;color:var(--text3);margin-left:4px;">${t.assigned_to}</span>`:''}
+        </div>
+      </div>
+      <button class="btn btn-d btn-sm" onclick="deleteTask('${t.id}')" style="flex-shrink:0;">削除</button>
+    </div>`;
+  }).join('');
+}
 
-K�HO��]�]J��]JK[�]�]JK�]JJN�ۜ�[H��[Y[���][[Y[��RY
-	�X�\�	�NY�[\��[��
-H�[�[��\�SI�]��[OH��۝\�^�N�L����܎��\�K]^�Nȏ��.�b�z*&:c,��k��`�ࢸ�o��f����]�����]\���B��ۜ�\P��ܜ�H��f��*lIΉؙ�X�YI�	��iyn��Ήؙ�XX��[�	�	�a�z)��Ήؙ�^Y[���	���x��8���Ήؙ�Yܘ^I�	��gx�k�.�Ήؙ�Yܘ^I�N[�[��\�SH\��X\
-HO��]��\��H�X�Z][H���]��\��H�X�Y����]���]��[OH��^�Nȏ��]��[OH�\�^N��^�[YۋZ][\Θ�[�\���\���X\��[�X���N��ȏ���[��\��H��Y�H	�\P��ܜ��K�\W_	ؙ�Yܘ^I�H���K�\_O��[����[��[OH��۝\�^�N�L���܎��\�K]^�Nȏ��K�]_	��O��[����[��[OH��۝\�^�N�L���܎��\�K]^�Nȏ��K��Y��	��O��[����]���]��\��H�X�]���K���_	��O�]����]����]ۈ�\��H�����Y��\�H�ۘ�X��H�[]PX�
-	��K�YI�H��[OH��^\��[�Όȏ�bb�fi؝]ۏ���]���
-K���[�	��NB�����ST\�[���[��[ۈ�[�\��[\�
-H�ۜ�\�H�[\˙�[\��O���X[�YOOX�\��[�X[Y
-N�ۜ�[H��[Y[���][[Y[��RY
-	��[S\�	�NY�[\��[��
-H�[�[��\�SI�]��[OH��۝\�^�N�L����܎��\�K]^�Nȏ���x�x�8����k��`�ࢸ�o��f����]�����]\���B��ۜ�\��H]�Z]��Z\�K�[
-\��X\
-�O��ܘY�U\�
-���ܘY�W�]
-JJN[�[��\�SH\��X\
+// ACTIVITIES
+function renderDPActs() {
+  const list = activities.filter(a => a.deal_id===currentDealId).sort((a,b) => new Date(b.date)-new Date(a.date));
+  const el = document.getElementById('dpActList');
+  if(\!list.length) { el.innerHTML='<div style="font-size:12px;color:var(--text3);">活動記録はありません</div>'; return; }
+  const typeColors = {'電話':'bg-blue','来店':'bg-accent','内見':'bg-yellow','メール':'bg-gray','その他':'bg-gray'};
+  el.innerHTML = list.map(a => `
+    <div class="act-item">
+      <div class="act-dot"></div>
+      <div style="flex:1;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+          <span class="badge ${typeColors[a.type]||'bg-gray'}">${a.type}</span>
+          <span style="font-size:10px;color:var(--text3);">${a.date||''}</span>
+          <span style="font-size:10px;color:var(--text3);">${a.staff||''}</span>
+        </div>
+        <div class="act-txt">${a.note||''}</div>
+      </div>
+      <button class="btn btn-d btn-sm" onclick="deleteAct('${a.id}')" style="flex-shrink:0;">削除</button>
+    </div>
+  `).join('');
+}
 
-�JHO��ۜ�X�ۈH���[W�\OOOI������Ι���[W�\OOOI�[XY�I���SQ�ΉђSI��ۜ���H���[W�\OOOI������Ι���[W�\OOOI�[XY�I���[Y�Ή��\���]\��]��\��H��[KZ][H���]��\��H��[KZX�ۈ	���H���X�۟O�]���H�Y�H��\���W_H�\��]H�؛[�Ȉ�[OH��^�N���܎��\�KZ[���N�^YX�ܘ][ێ��ۙNȏ�ً��[Wۘ[Y_O�O���[��[OH��۝\�^�N�L���܎��\�K]^�N�X\��[�\�Y��ȏ����ܙX]Y�]	��K��X�JL
-_O��[����]ۈ�\��H�����Y��\�H�ۘ�X��H�[]Q�[J	�ً�YI�H��bb�fi؝]ۏ���]��JK���[�	��NB��\�[���[��[ۈ\�Y�[JJH�ۜ��[HHK�\��]��[\��N�Y�Y�[_X�\��[�X[Y
-H�]\���ۜ�^H�[K��[YK��]
-	ˉ�K��
+// FILES
+async function renderDPFiles() {
+  const list = files.filter(f => f.deal_id===currentDealId);
+  const el = document.getElementById('dpFileList');
+  if(\!list.length) { el.innerHTML='<div style="font-size:12px;color:var(--text3);">ファイルはありません</div>'; return; }
+  const urls = await Promise.all(list.map(f => storageUrl(f.storage_path)));
+  el.innerHTML = list.map((f,i) => {
+    const icon = f.file_type==='pdf'?'PDF':f.file_type==='image'?'IMG':'FILE';
+    const cls = f.file_type==='pdf'?'pdf':f.file_type==='image'?'img':'other';
+    return `<div class="file-item">
+      <div class="file-icon ${cls}">${icon}</div>
+      <a href="${urls[i]}" target="_blank" style="flex:1;color:var(--info);text-decoration:none;">${f.file_name}</a>
+      <span style="font-size:10px;color:var(--text3);margin-right:8px;">${(f.created_at||'').slice(0,10)}</span>
+      <button class="btn btn-d btn-sm" onclick="deleteFile('${f.id}')">削除</button>
+    </div>`;
+  }).join('');
+}
 
-K����\��\�J
-N�ۜ��\HH����K�[��Y\�^
-O���Ζ�ڜ��	ڜY��	����	��Y��	��X�	�K�[��Y\�^
-O��[XY�IΉ��\���ۜ�]HX[����\��[�X[YK��]K����
-_W�ٚ[K��[Y_X�ۜ�]HH�X[�Y��\��[�X[Y�[Wۘ[YN��[K��[YK�[W�\N��\K�ܘY�W�]�]ܙX]Y�]��]�]J
-K��T����[��
-K��X�JL
-_N]�Z]�ܘY�U\�Y
-]�[JN�ۜ��\�H]�Z]�[��	�X[ٚ[\��]JN�[\˜\�
-�\��JNK�\��]��[YOI����[�\��[\�
-NB�\�[���[��[ۈ[]Q�[JY
-HY�X�ۙ�\�J	��d��k���x�x�8���हbb�fi8�e��o��fx�b��'��JH�]\��]�Z]�[
-	�X[ٚ[\��Y
-N�[\�H�[\˙�[\�O��YOOZY
-N��[�\��[\�
-NB����OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB����Q�HQ�S��B���OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB��[��[ۈY�[��T�Y�J
-H�ۜ�HX[˙�[�
-O��YOOX�\��[�X[Y
-N�Y�Y
-H�]\���ۜ��HH�Q�T˚[�^ي��Y�JNY��O
-H�[\�
-	��d��k��x����8�8�k�`,��x�x�8�o��f����N��]\���B�Y��O�T�Q�T˛[��LJHY��ۙ�\�J	��n��"8���o%y�(x�e��c9k�9.���e��o��e��g�� ��$9�!8�j8�e��i�����x��8ஸ�e��o��fx�b？')) closeDeal('案件');
+async function uploadFile(e) {
+  const file = e.target.files[0]; if(\!file||\!currentDealId) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  const ftype = ['pdf'].includes(ext)?'pdf':['jpg','jpeg','png','gif','webp'].includes(ext)?'image':'other';
+  const path = `deals/${currentDealId}/${Date.now()}_${file.name}`;
+  const data = {deal_id:currentDealId, file_name:file.name, file_type:ftype, storage_path:path, created_at:new Date().toISOString().slice(0,10)};
+  await storageUpload(path, file);
+  const res = await dbIns('deal_files', data);
+  files.push(res[0]);
+  e.target.value=''; renderDPFiles();
+}
+async function deleteFile(id) {
+  if(\!confirm('このファイルを削除しますか？')) return;
+  await dbDel('deal_files', id);
+  files = files.filter(x => x.id\!==id); renderDPFiles();
+}
+
+// ============================================================
+// STAGE ADVANCE
+// ============================================================
+function advanceStage() {
+  const d = deals.find(x => x.id===currentDealId); if(\!d) return;
+  const si = STAGES.indexOf(d.stage);
+  if(si<0) { alert('このステージは進められません'); return; }
+  if(si>=STAGES.length-1) {
+    if(confirm('決済・引渡しが完了しました。成約としてクローズしますか？')) closeDeal('成約');
     return;
   }
   const mustUncheck = getUncheckedMust(d);
@@ -1175,412 +1214,396 @@ H�[\�
   document.getElementById('stageSelect').innerHTML = STAGES.map(s => `<option value="${s}" ${s===STAGES[si+1]?'selected':''}>${s}</option>`).join('');
   document.getElementById('stageDeadline').value = d.deadline||'';
   document.getElementById('stageWarnBox').innerHTML = mustUncheck
-    ? `<div class="warn-box">義務対応が霪完于の标盬があります。このまま逷あますか��'��]����]��\��H�[���X�����(x�k��x����8�8�j�`,��o��o��fx� ��]����[Y[���][[Y[��RY
-	��Y�S[�[	�K��\��\��Y
-	��[��NB��[��[ۈ���Q�Z[X[
+    ? `<div class="warn-box">義務対応が未完了の項目があります。このまま進めますか？</div>`
+    : `<div class="info-box">次のステージに進みます。</div>`;
+  document.getElementById('stageModal').classList.add('open');
+}
+function closeFailDeal() { if(confirm('この案件を「失注」としてクローズしますか？')) closeDeal('失注'); }
 
-H�Y��ۙ�\�J	��d��k��b9.��स�#9i,y��8�#x�j8�e��i�����x��8ஸ�e��o��fx�b��'��JH���QX[
-	�i,y��	�N�B��\�[���[��[ۈ���QX[
-�\�[
-H]�Z]�\
-	�X[���\��[�X[Y��Y�N��\�[JN�ۜ�YHX[˙�[�[�^
-O��YOOX�\��[�X[Y
-NY�Y�L
-HX[��YK��Y�HH�\�[���Q
+async function closeDeal(result) {
+  await dbUpd('deals', currentDealId, {stage:result});
+  const idx = deals.findIndex(x => x.id===currentDealId);
+  if(idx>=0) deals[idx].stage = result;
+  closeDP(); renderDeals(); updateKPIs(); renderDashboard();
+}
+async function saveStage() {
+  const id = document.getElementById('stageDealId').value;
+  const stage = document.getElementById('stageSelect').value;
+  const deadline = document.getElementById('stageDeadline').value;
+  await dbUpd('deals', id, {stage, deadline});
+  const idx = deals.findIndex(x => x.id===id);
+  if(idx>=0) deals[idx] = {...deals[idx], stage, deadline};
+  closeModal('stageModal'); openDP(id); renderDeals(); updateKPIs(); renderDashboard();
+}
 
-N��[�\�X[�
-N�\]R�\�
-N��[�\�\���\�
+// ============================================================
+// DEAL CRUD
+// ============================================================
+function openDealModal(id) {
+  const d = id?deals.find(x => x.id===id):null;
+  document.getElementById('did').value = id||'';
+  document.getElementById('dealModalTitle').textContent = d?'案件を編集':'案件を作成';
+  const custSel = document.getElementById('dCustId');
+  custSel.innerHTML = '<option value="">顧客を選択…</option>'+customers.map(c => `<option value="${c.id}" ${d?.customer_id===c.id?'selected':''}>${c.sei} ${c.mei}（${c.role|）</option>`).join('');
+  const propSel = document.getElementById('dPropId');
+  propSel.innerHTML = '<option value="">物件を選択…</option>'+properties.map(p => `<option value="${p.id}" ${d?.property_id===p.id?'selected':''}>${p.name}</option>`).join('');
+  document.getElementById('dAgency').value = d?.agency_type||'専任媒介';
+  document.getElementById('dDeadline').value = d?.deadline||'';
+  document.getElementById('dMemo').value = d?.memo||'';
+  document.getElementById('dealModal').classList.add('open');
+}
+function openEditDeal(id) { openDealModal(id); }
 
-NB�\�[���[��[ۈ�]�T�Y�J
-H�ۜ�YH��[Y[���][[Y[��RY
-	��Y�QX[Y	�K��[YN�ۜ��Y�HH��[Y[���][[Y[��RY
-	��Y�T�[X�	�K��[YN�ۜ�XY[�HH��[Y[���][[Y[��RY
-	��Y�QXY[�I�K��[YN]�Z]�\
-	�X[��Y��Y�KXY[�_JN�ۜ�YHX[˙�[�[�^
-O��YOOZY
-NY�Y�L
-HX[��YHHˋ��X[��YK�Y�KXY[�_N���S[�[
-	��Y�S[�[	�N��[�
-Y
-N��[�\�X[�
-N�\]R�\�
-N��[�\�\���\�
+async function saveDeal() {
+  const id = document.getElementById('did').value;
+  const data = {
+    customer_id: document.getElementById('dCustId').value,
+    property_id: document.getElementById('dPropId').value,
+    agency_type: document.getElementById('dAgency').value,
+    deadline: document.getElementById('dDeadline').value,
+    memo: document.getElementById('dMemo').value
+  };
+  if(\!data.customer_id||\!data.property_id) { alert('顧客と物件を選択してください'); return; }
+  if(id) {
+    await dbUpd('deals', id, data);
+    const i = deals.findIndex(x => x.id===id); if(i>=0) deals[i]={...deals[i],...data};
+  } else {
+    const res = await dbIns('deals', {...data, stage:'問合せ', created_at:new Date().toISOString()});
+    deals.push(res[0]);
+  }
+  closeModal('dealModal'); refreshAll();
+}
 
-NB����OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB���PSԕQ���OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB��[��[ۈ�[�X[[�[
-Y
-H�ۜ�HY�X[˙�[�
-O��YOOZY
-N��[��[Y[���][[Y[��RY
-	�Y	�K��[YHHY	����[Y[���][[Y[��RY
-	�X[[�[]I�K�^�۝[�H���b9.��ह��:f�Ή��b9.��ह/g9�$	��ۜ��\��[H��[Y[���][[Y[��RY
-	��\�Y	�N�\��[�[��\�SH	��[ۈ�[YOH���hi�k��ऺ`n9����)���[ۏ����\��Y\�˛X\
-�O��[ۈ�[YOH��˚YH�	�˘�\��Y\��YOOX˚Y���[X�Y	Ή��O��˜�Z_H	�˛YZ_{�"	�˜��_{�"O��[ۏ�
-K���[�	��N�ۜ����[H��[Y[���][[Y[��RY
-	���Y	�N���[�[��\�SH	��[ۈ�[YOH����jy.��ऺ`n9����)���[ۏ�����\�Y\˛X\
-O��[ۈ�[YOH���YH�	�˜��\�W�YOO\�Y���[X�Y	Ή��O����[Y_O��[ۏ�
-K���[�	��N��[Y[���][[Y[��RY
-	�Y�[��I�K��[YHH˘Y�[��W�\_	�l �.��j��.�����[Y[���][[Y[��RY
-	�XY[�I�K��[YHH˙XY[�_	����[Y[���][[Y[��RY
-	�Y[[��K��[YHH˛Y[[�	����[Y[���][[Y[��RY
-	�X[[�[	�K��\��\��Y
-	��[��NB��[��[ۈ�[�Y]X[
-Y
-H��[�X[[�[
-Y
-N�B��\�[���[��[ۈ�]�QX[
+// ============================================================
+// CUSTOMER CRUD
+// ============================================================
+function renderCusts() {
+  const q = (document.getElementById('custSearch')?.value||'').toLowerCase();
+  const rf = document.getElementById('custRoleFilter')?.value||'';
+  let list = customers.filter(c => {
+    if(q && \!`${c.sei}${c.mei}`.toLowerCase().includes(q) && \!(c.tel||'').includes(q)) return false;
+    if(rf && c.role\!==rf) return false;
+    return true;
+  });
+  const tbody = document.getElementById('custTbody');
+  if(\!list.length) { tbody.innerHTML='<tr><td colspan="7" class="empty">該当なし</td></tr>'; return; }
+  tbody.innerHTML = list.map(c => {
+    const dealCnt = deals.filter(d => d.customer_id===c.id).length;
+    const activeCnt = deals.filter(d => d.customer_id===c.id && \!STAGES_DONE.includes(d.stage)).length;
+    return `<tr onclick="openEDPForCustomer('${c.id}')" style="cursor:pointer;">
+      <td data-label="氏名"><strong>${c.sei} ${c.mei}</strong></td>
+      <td data-label="電話" class="t2">${c.tel||'—'}</td>
+      <td data-label="役割"><span class="badge bg-blue">${c.role}</span></td>
+      <td data-label="メール" class="t2">${c.email||'—'}</td>
+      <td data-label="案件数"><span style="color:var(--info);">${dealCnt}件${activeCnt?` <span class="badge bg-accent" style="font-size:9px;">進行中${activeCnt}</span>`:''}</span></td>
+      <td data-label="登録日" class="t2">${(c.created_at||'').slice(0,10)}</td>
+      <td><button class="btn btn-s btn-sm" onclick="event.stopPropagation();openCustModal('${c.id}')">編集</button></td>
+    </tr>`;
+  }).join('');
+}
+function openCustModal(id) {
+  const c = id?customers.find(x => x.id===id):null;
+  document.getElementById('cid').value = id||'';
+  document.getElementById('custModalTitle').textContent = c?'顧客を編集':'顧客を追加';
+  document.getElementById('cSei').value = c?.sei||'';
+  document.getElementById('cMei').value = c?.mei||'';
+  document.getElementById('cTel').value = c?.tel||'';
+  document.getElementById('cEmail').value = c?.email||'';
+  document.getElementById('cRole').value = c?.role||'買主';
+  document.getElementById('cBudget').value = c?.budget||'';
+  document.getElementById('cMemo').value = c?.memo||'';
+  document.getElementById('custModal').classList.add('open');
+}
+async function saveCust() {
+  const id = document.getElementById('cid').value;
+  const data = {sei:document.getElementById('cSei').value, mei:document.getElementById('cMei').value, tel:document.getElementById('cTel').value, email:document.getElementById('cEmail').value, role:document.getElementById('cRole').value, budget:document.getElementById('cBudget').value, memo:document.getElementById('cMemo').value};
+  if(id) {
+    await dbUpd('customers', id, data);
+    const i = customers.findIndex(x => x.id===id); if(i>=0) customers[i]={...customers[i],...data};
+  } else {
+    const res = await dbIns('customers', {...data, created_at:new Date().toISOString()});
+    customers.push(res[0]);
+  }
+  closeModal('custModal'); renderCusts();
+}
 
-H�ۜ�YH��[Y[���][[Y[��RY
-	�Y	�K��[YN�ۜ�]HH�\��Y\��Y���[Y[���][[Y[��RY
-	��\�Y	�K��[YK���\�W�Y���[Y[���][[Y[��RY
-	���Y	�K��[YK�Y�[��W�\N���[Y[���][[Y[��RY
-	�Y�[��I�K��[YK�XY[�N���[Y[���][[Y[��RY
-	�XY[�I�K��[YK�Y[[Έ��[Y[���][[Y[��RY
-	�Y[[��K��[YB�NY�Y]K��\��Y\��YY]K���\�W�Y
-H�[\�
-	�hi�k���j9�jy.��ऺ`n9����e��i��c��h8�ex�a	�N��]\���B�Y�Y
-H]�Z]�\
-	�X[��Y]JN�ۜ�HHX[˙�[�[�^
-O��YOOZY
-N�Y�O�L
-HX[��WO^ˋ��X[��WK���]_NH[�H�ۜ��\�H]�Z]�[��	�X[��ˋ��]K�Y�N��ec�d"8�f��ܙX]Y�]��]�]J
-K��T����[��
-_JNX[˜\�
-�\��JNB����S[�[
-	�X[[�[	�N��Y��\�[
+// ============================================================
+// PROPERTY CRUD
+// ============================================================
+function renderProps() {
+  const q = (document.getElementById('propSearch')?.value||'').toLowerCase();
+  const ptf = document.getElementById('propTypeFilter')?.value||'';
+  const dtf = document.getElementById('propDealFilter')?.value||'';
+  const hideClosed = document.getElementById('propHideClosed')?.checked||false;
+  const all = properties.filter(p => {
+    if(q && \!(p.name||'').toLowerCase().includes(q) && \!(p.addr||'').toLowerCase().includes(q)) return false;
+    if(ptf && p.prop_type\!==ptf) return false;
+    if(dtf && p.deal_type\!==dtf) return false;
+    return true;
+  });
+  const list = hideClosed?all.filter(p => p.status\!=='成約'):all;
+  const hiddenCount = all.length-list.length;
+  const countEl = document.getElementById('propCount');
+  if(countEl) {
+    countEl.innerHTML = hideClosed&&hiddenCount>0
+      ? `${list.length}件表示中 <span style="color:var(--danger);">（成約 ${hiddenCount}件を非表示）</span>`
+      : `${list.length}件`;
+  }
+  const grid = document.getElementById('propGrid');
+  if(\!list.length) { grid.innerHTML=`<div class="empty" style="grid-column:1/-1;">${hideClosed?'成約以外の':''}該当する物件がありません</div>`; return; }
+  grid.innerHTML = list.map(p => {
+    const activeCnt = deals.filter(d => d.property_id===p.id && \!STAGES_DONE.includes(d.stage)).length;
+    return `<div class="pc" onclick="openEDPForProperty('${p.id}')">
+      <div class="pc-img">${p.prop_type}／${p.deal_type}</div>
+      <div class="pc-body">
+        <div class="pc-name">${p.name}</div>
+        <div class="pc-addr">${p.addr}</div>
+        <div class="pc-price">${p.price}</div>
+        <div class="pc-meta">
+          <span class="badge bg-gray">${p.prop_type}</span>
+          <span class="badge ${p.status==='募集中'?'bg-green':p.status==='商談中'?'bg-yellow':'bg-red'}">${p.status}</span>
+          ${activeCnt?`<span class="badge bg-accent">案件 ${activeCnt}件</span>`:''}
+          ${p.layout?`<span class="badge bg-gray">${p.layout}`+'</span>':''}
+          ${p.area?`<span class="badge bg-gray">${p.area}`+'</span>':''}
+        </div>
+        <div style="margin-top:8px;text-align:right;">
+          <button class="btn btn-s btn-sm" onclick="event.stopPropagation();openPropModal('${p.id}')">編集</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function togglePropFields() {
+  document.getElementById('propBldgFields').style.display = document.getElementById('pPropType').value==='土地'?'none':'';
+}
+function openPropModal(id) {
+  const p = id?properties.find(x => x.id===id):null;
+  document.getElementById('pid').value = id||'';
+  document.getElementById('propModalTitle').textContent = p?'物件を編集':'物件を追加';
+  document.getElementById('pName').value = p?.name||'';
+  document.getElementById('pPropType').value = p?.prop_type||'区分';
+  document.getElementById('pAddr').value = p?.addr||'';
+  document.getElementById('pDealType').value = p?.deal_type||'売買';
+  document.getElementById('pPrice').value = p?.price||'';
+  document.getElementById('pArea').value = p?.area||'';
+  document.getElementById('pAge').value = p?.age||'';
+  document.getElementById('pLayout').value = p?.layout||'';
+  document.getElementById('pStatus').value = p?.status||'募集中';
+  document.getElementById('pMemo').value = p?.memo||'';
+  togglePropFields();
+  document.getElementById('propModal').classList.add('open');
+}
+async function saveProp() {
+  const id = document.getElementById('pid').value;
+  const data = {name:document.getElementById('pName').value, prop_type:document.getElementById('pPropType').value, addr:document.getElementById('pAddr').value, deal_type:document.getElementById('pDealType').value, price:document.getElementById('pPrice').value, area:document.getElementById('pArea').value, age:document.getElementById('pAge').value, layout:document.getElementById('pLayout').value, status:document.getElementById('pStatus').value, memo:document.getElementById('pMemo').value};
+  if(id) {
+    await dbUpd('properties', id, data);
+    const i = properties.findIndex(x => x.id===id); if(i>=0) properties[i]={...properties[i],...data};
+  } else {
+    const res = await dbIns('properties', {...data, created_at:new Date().toISOString()});
+    properties.push(res[0]);
+  }
+  closeModal('propModal'); renderProps();
+}
 
-NB����OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB����T��QT�ԕQ���OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB��[��[ۈ�[�\��\��
-H�ۜ�HH
-��[Y[���][[Y[��RY
-	��\��X\��	�O˝�[Y_	��K����\��\�J
-N�ۜ���H��[Y[���][[Y[��RY
-	��\���Q�[\��O˝�[Y_	��]\�H�\��Y\�˙�[\��O�Y�H	��X	�˜�Z_I�˛YZ_X����\��\�J
-K�[��Y\�JH	��J˝[	��K�[��Y\�JJH�]\���[�NY���	��˜��WOO\��H�]\���[�N�]\���YNJN�ۜ���HH��[Y[���][[Y[��RY
-	��\���I�NY�[\��[��
-H���K�[��\�SI������[�H�Ȉ�\��H�[\H��*l�od��j��e���������]\���B���K�[��\�SH\��X\
-�O��ۜ�X[۝HX[˙�[\�O���\��Y\��YOOX˚Y
-K�[���ۜ�X�]�P۝HX[˙�[\�O���\��Y\��YOOX˚Y	��T�Q�T��ӑK�[��Y\���Y�JJK�[���]\���ۘ�X��H��[�Q�ܐ�\��Y\�	��˚YI�H��[OH��\��܎��[�\�ȏ��]K[X�[H��#�d#H����ۙω�˜�Z_H	�˛YZ_O���ۙϏ���]K[X�[H�f��*lH��\��H�����˝[	��%	�O���]K[X�[H�onybl����[��\��H��Y�H��X�YH���˜��_O��[�����]K[X�[H���x��8��Ȉ�\��H�����˙[XZ[	��%	�O���]K[X�[H��b9.���l���[��[OH���܎��\�KZ[���Nȏ��X[۝y.��X�]�P۝��[��\��H��Y�H��XX��[���[OH��۝\�^�N�\ȏ�`,�(c9.+I�X�]�P۝O��[�����O��[�����]K[X�[H��n�c,���H��\��H�����˘ܙX]Y�]	��K��X�JL
-_O�����]ۈ�\��H�����\���\�H�ۘ�X��H�]�[������Y�][ۊ
-N��[��\�[�[
-	��˚YI�H����:f�؝]ۏ�������JK���[�	��NB��[��[ۈ�[��\�[�[
-Y
-H�ۜ��HY��\��Y\�˙�[�
-O��YOOZY
-N��[��[Y[���][[Y[��RY
-	��Y	�K��[YHHY	����[Y[���][[Y[��RY
-	��\�[�[]I�K�^�۝[�H���hi�k��ह��:f�Ή�hi�k��ऺ/�yb�	���[Y[���][[Y[��RY
-	���ZI�K��[YHH�˜�Z_	����[Y[���][[Y[��RY
-	��YZI�K��[YHH�˛YZ_	����[Y[���][[Y[��RY
-	��[	�K��[YHH�˝[	����[Y[���][[Y[��RY
-	��[XZ[	�K��[YHH�˙[XZ[	����[Y[���][[Y[��RY
-	�ԛ�I�K��[YHH�˜��_	�,��..����[Y[���][[Y[��RY
-	�НY�]	�K��[YHH�˘�Y�]	����[Y[���][[Y[��RY
-	��Y[[��K��[YHH�˛Y[[�	����[Y[���][[Y[��RY
-	��\�[�[	�K��\��\��Y
-	��[��NB�\�[���[��[ۈ�]�P�\�
+// ============================================================
+// TASKS
+// ============================================================
+function renderTasks() {
+  const q = (document.getElementById('taskSearch')?.value||'').toLowerCase();
+  const sf = document.getElementById('taskStatusFilter')?.value;
+  const pf = document.getElementById('taskPriFilter')?.value||'';
+  let list = tasks.filter(t => {
+    const d = deals.find(x => x.id===t.deal_id);
+    const c = customers.find(x => x.id===d?.customer_id);
+    const name = c?`${c.sei}${c.mei}`.toLowerCase():'';
+    if(q && \!(t.title||'').toLowerCase().includes(q) && \!name.includes(q)) return false;
+    if(sf==='undone' && t.done) return false;
+    if(sf==='done' && \!t.done) return false;
+    if(pf && t.priority\!==pf) return false;
+    return true;
+  }).sort((a,b) => new Date(a.due_date||'9999')-new Date(b.due_date||'9999'));
+  const tbody = document.getElementById('taskTbody');
+  if(\!list.length) { tbody.innerHTML='<tr><td colspan="6" class="empty">タスクはありません</td></tr>'; return; }
+  const today = new Date(); today.setHours(0,0,0,0);
+  tbody.innerHTML = list.map(t => {
+    const d = deals.find(x => x.id===t.deal_id);
+    const c = customers.find(x => x.id===d?.customer_id);
+    const due = t.due_date?new Date(t.due_date):null;
+    if(due) due.setHours(0,0,0,0);
+    const diff = due?Math.ceil((due-today)/(1000*60*60*24)):null;
+    const dueCls = diff===null?'':diff<0?'color:var(--danger);font-weight:600;':diff===0?'color:var(--warn);font-weight:600;':'';
+    return `<tr style="${t.done?'opacity:.5;':''}">
+      <td data-label="タスク" style="${t.done?'text-decoration:line-through;':''}">${t.title}</td>
+      <td data-label="案件" class="t2">${c?c.sei+c.mei:'—'}</td>
+      <td data-label="優先度"><span class="badge ${PRI_COLORS[t.priority]||'bg-gray'}">${t.priority}</span></td>
+      <td data-label="期限"><span style="font-size:12px;${dueCls}">${t.due_date||'—'}</span></td>
+      <td data-label="担当" class="t2">${t.assigned_to||'—'}</td>
+      <td data-label="完了"><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask('${t.id}',this.checked)" style="cursor:pointer;"></td>
+    </tr>`;
+  }).join('');
+}
+function openTaskModal(dealId) {
+  document.getElementById('taskDealId').value = dealId||currentDealId||'';
+  document.getElementById('tTitle').value='';
+  document.getElementById('tDue').value = new Date().toISOString().slice(0,10);
+  document.getElementById('tPri').value='中';
+  document.getElementById('tAssign').value='岩本';
+  document.getElementById('taskModal').classList.add('open');
+}
+async function saveTask() {
+  const dealId = document.getElementById('taskDealId').value;
+  const deal = deals.find(d => d.id===dealId);
+  const data = {deal_id:dealId, customer_id:deal?.customer_id||null, title:document.getElementById('tTitle').value, due_date:document.getElementById('tDue').value, priority:document.getElementById('tPri').value, done:false, assigned_to:document.getElementById('tAssign').value, created_at:new Date().toISOString()};
+  const res = await dbIns('tasks', data); tasks.push(res[0]);
+  closeModal('taskModal'); renderTasks(); renderDPTasks(); renderDashboard(); updateKPIs();
+}
+async function toggleTask(id, checked) {
+  await dbUpd('tasks', id, {done:checked});
+  const i = tasks.findIndex(x => x.id===id); if(i>=0) tasks[i].done=checked;
+  renderTasks(); renderDPTasks(); renderDashboard(); updateKPIs();
+}
+async function quickDoneTask(id, checked) { await toggleTask(id, checked); }
+async function deleteTask(id) {
+  if(\!confirm('このタスクを削除しますか？')) return;
+  await dbDel('tasks', id);
+  tasks = tasks.filter(x => x.id\!==id); renderTasks(); renderDPTasks(); updateKPIs();
+}
 
-H�ۜ�YH��[Y[���][[Y[��RY
-	��Y	�K��[YN�ۜ�]HH��ZN���[Y[���][[Y[��RY
-	���ZI�K��[YKYZN���[Y[���][[Y[��RY
-	��YZI�K��[YK[���[Y[���][[Y[��RY
-	��[	�K��[YK[XZ[���[Y[���][[Y[��RY
-	��[XZ[	�K��[YK��N���[Y[���][[Y[��RY
-	�ԛ�I�K��[YK�Y�]���[Y[���][[Y[��RY
-	�НY�]	�K��[YKY[[Ι��[Y[���][[Y[��RY
-	��Y[[��K��[Y_NY�Y
-H]�Z]�\
-	��\��Y\���Y]JN�ۜ�HH�\��Y\�˙�[�[�^
-O��YOOZY
-N�Y�O�L
-H�\��Y\���WO^ˋ���\��Y\���WK���]_NH[�H�ۜ��\�H]�Z]�[��	��\��Y\���ˋ��]KܙX]Y�]��]�]J
-K��T����[��
-_JN�\��Y\�˜\�
-�\��JNB����S[�[
-	��\�[�[	�N��[�\��\��
-NB����OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB�����T�HԕQ���OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB��[��[ۈ�[�\����
-H�ۜ�HH
-��[Y[���][[Y[��RY
-	����X\��	�O˝�[Y_	��K����\��\�J
-N�ۜ��H��[Y[���][[Y[��RY
-	���\Q�[\��O˝�[Y_	���ۜ��H��[Y[���][[Y[��RY
-	���X[�[\��O˝�[Y_	���ۜ�YP���YH��[Y[���][[Y[��RY
-	���YP���Y	�O˘�X��Y�[�N�ۜ�[H��\�Y\˙�[\�O�Y�H	��J��[Y_	��K����\��\�J
-K�[��Y\�JH	��J�Y�	��K����\��\�J
-K�[��Y\�JJH�]\���[�NY��	������\WOO\�H�]\���[�NY��	���X[�\WOOY�H�]\���[�N�]\���YNJN�ۜ�\�HYP���Y�[��[\�O���]\�OOI��$9�!	�N�[�ۜ�Y[���[�H[�[��[\��[���ۜ���[�[H��[Y[���][[Y[��RY
-	�����[�	�NY���[�[
-H��[�[�[��\�SHYP���Y	��Y[���[����	�\��[��y.��(j9�.�.+H�[��[OH���܎��\�KY[��\�Nȏ��"9�$9�!	�Y[���[�y.��ऺgg�(j9�.��"O��[����	�\��[��y.�B��ۜ�ܚYH��[Y[���][[Y[��RY
-	���ܚY	�NY�[\��[��
-H�ܚY�[��\�SX]��\��H�[\H��[OH�ܚYX��[[��K�LNȏ��YP���Y���$9�!9.�yi%��k�Ή��z*l�od��fx���jy.���c8�`�ࢸ�o��f����]����]\���B�ܚY�[��\�SH\��X\
-O��ۜ�X�]�P۝HX[˙�[\�O����\�W�YOO\�Y	��T�Q�T��ӑK�[��Y\���Y�JJK�[���]\��]��\��H�Ȉۘ�X��H��[�Q�ܔ��\�J	���YI�H���]��\��H��Z[Yȏ������\_{�#���X[�\_O�]���]��\��H��X��H���]��\��H��[�[YH�����[Y_O�]���]��\��H��XY�����Y�O�]���]��\��H��\�X�H�����X�_O�]���]��\��H��[Y]H����[��\��H��Y�H��Yܘ^H�������\_O��[����[��\��H��Y�H	���]\�OOI�b��f�.+I��ؙ�YܙY[�Μ��]\�OOI�ea�*��.+I��ؙ�^Y[��Ήؙ�\�Y	�H�����]\�O��[���	�X�]�P۝��[��\��H��Y�H��XX��[����b9.�	�X�]�P۝y.���[�����B�	��^[�]��[��\��H��Y�H��Yܘ^H����^[�]X
-����[��Ή��B�	��\�XO��[��\��H��Y�H��Yܘ^H����\�X_X
-����[��Ή��B��]���]��[OH�X\��[�]���^X[Yێ��Y�ȏ���]ۈ�\��H�����\���\�H�ۘ�X��H�]�[������Y�][ۊ
-N��[���[�[
-	���YI�H����:f�؝]ۏ���]����]����]��JK���[�	��NB��[��[ۈ���T���Y[�
-H��[Y[���][[Y[��RY
-	����њY[��K��[K�\�^HH��[Y[���][[Y[��RY
-	���\I�K��[YOOOI�g'�g,	��ۛۙIΉ��B��[��[ۈ�[���[�[
-Y
-H�ۜ�HY���\�Y\˙�[�
-O��YOOZY
-N��[��[Y[���][[Y[��RY
-	�Y	�K��[YHHY	����[Y[���][[Y[��RY
-	���[�[]I�K�^�۝[�H���jy.��ह��:f�Ή��jy.��ऺ/�yb�	���[Y[���][[Y[��RY
-	��[YI�K��[YHH˛�[Y_	����[Y[���][[Y[��RY
-	���\I�K��[YHH˜���\_	�c.�b!����[Y[���][[Y[��RY
-	�Y��K��[YHH˘Y�	����[Y[���][[Y[��RY
-	�X[\I�K��[YHH˙X[�\_	�h�,�����[Y[���][[Y[��RY
-	��X�I�K��[YHH˜�X�_	����[Y[���][[Y[��RY
-	�\�XI�K��[YHH˘\�X_	����[Y[���][[Y[��RY
-	�Y�I�K��[YHH˘Y�_	����[Y[���][[Y[��RY
-	�^[�]	�K��[YHH˛^[�]	����[Y[���][[Y[��RY
-	��]\��K��[YHH˜�]\�	�b��f�.+I���[Y[���][[Y[��RY
-	�Y[[��K��[YHH˛Y[[�	�����T���Y[�
-N��[Y[���][[Y[��RY
-	���[�[	�K��\��\��Y
-	��[��NB�\�[���[��[ۈ�]�T��
+// ============================================================
+// ACTIVITIES
+// ============================================================
+function renderActs() {
+  const q = (document.getElementById('actSearch')?.value||'').toLowerCase();
+  const tf = document.getElementById('actTypeFilter')?.value||'';
+  let list = activities.filter(a => {
+    const d = deals.find(x => x.id===a.deal_id);
+    const c = customers.find(x => x.id===d?.customer_id||a.customer_id);
+    const name = c?`${c.sei}${c.mei}`.toLowerCase():'';
+    if(q && \!name.includes(q) && \!(a.note||'').toLowerCase().includes(q)) return false;
+    if(tf && a.type\!==tf) return false;
+    return true;
+  }).sort((a,b) => new Date(b.date)-new Date(a.date));
+  const tbody = document.getElementById('actTbody');
+  if(\!list.length) { tbody.innerHTML='<tr><td colspan="6" class="empty">記録はありません</td></tr>'; return; }
+  const typeColors = {'電話':'bg-blue','来店':'bg-accent','内見':'bg-yellow','メール':'bg-gray','その他':'bg-gray'};
+  tbody.innerHTML = list.map(a => {
+    const d = deals.find(x => x.id===a.deal_id);
+    const c = customers.find(x => x.id===d?.customer_id);
+    const p = properties.find(x => x.id===d?.property_id);
+    const clickable = d?`onclick="openDP('${d.id}')" style="cursor:pointer;" title="案件詳細を開く"`:'';
+    return `<tr ${clickable}>
+      <td data-label="日時" class="t2">${a.date||'—'}</td>
+      <td data-label="種類"><span class="badge ${typeColors[a.type]||'bg-gray'}">${a.type}</span></td>
+      <td data-label="顧客">${c?`<strong>${c.sei} ${c.mei}</strong>`:'—'}</td>
+      <td data-label="案件">${d?`<span class="badge ${STAGE_COLORS[d.stage]||'bg-gray'}" style="margin-right:4px;">${d.stage}</span><span class="t2" style="font-size:12px;">${p?.name||'—'}</span>`:'—'}</td>
+      <td data-label="内容">${a.note||'—'}</td>
+      <td data-label="担当" class="t2">${a.staff||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+function openActModal(dealId) {
+  document.getElementById('actDealId').value = dealId||currentDealId||'';
+  document.getElementById('aDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('aNote').value='';
+  document.getElementById('aStaff').value='岩本';
+  document.getElementById('actModal').classList.add('open');
+}
+async function saveAct() {
+  const dealId = document.getElementById('actDealId').value;
+  const deal = deals.find(d => d.id===dealId);
+  const data = {deal_id:dealId, customer_id:deal?.customer_id||null, type:document.getElementById('aType').value, date:document.getElementById('aDate').value, note:document.getElementById('aNote').value, staff:document.getElementById('aStaff').value, created_at:new Date().toISOString()};
+  const res = await dbIns('activities', data); activities.unshift(res[0]);
+  closeModal('actModal'); renderActs(); renderDPActs(); renderDashboard();
+}
+async function deleteAct(id) {
+  if(\!confirm('この活動記録を削除しますか？')) return;
+  await dbDel('activities', id);
+  activities = activities.filter(x => x.id\!==id); renderActs(); renderDPActs();
+}
 
-H�ۜ�YH��[Y[���][[Y[��RY
-	�Y	�K��[YN�ۜ�]HHۘ[YN���[Y[���][[Y[��RY
-	��[YI�K��[YK���\N���[Y[���][[Y[��RY
-	���\I�K��[YKY����[Y[���][[Y[��RY
-	�Y��K��[YKX[�\N���[Y[���][[Y[��RY
-	�X[\I�K��[YK�X�N���[Y[���][[Y[��RY
-	��X�I�K��[YK\�XN���[Y[���][[Y[��RY
-	�\�XI�K��[YKY�N���[Y[���][[Y[��RY
-	�Y�I�K��[YK^[�]���[Y[���][[Y[��RY
-	�^[�]	�K��[YK�]\Ι��[Y[���][[Y[��RY
-	��]\��K��[YKY[[Ι��[Y[���][[Y[��RY
-	�Y[[��K��[Y_NY�Y
-H]�Z]�\
-	���\�Y\��Y]JN�ۜ�HH��\�Y\˙�[�[�^
-O��YOOZY
-N�Y�O�L
-H��\�Y\��WO^ˋ����\�Y\��WK���]_NH[�H�ۜ��\�H]�Z]�[��	���\�Y\��ˋ��]KܙX]Y�]��]�]J
-K��T����[��
-_JN��\�Y\˜\�
-�\��JNB����S[�[
-	���[�[	�N��[�\����
-NB����OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB���T����OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB��[��[ۈ�[�\�\���
-H�ۜ�HH
-��[Y[���][[Y[��RY
-	�\���X\��	�O˝�[Y_	��K����\��\�J
-N�ۜ�وH��[Y[���][[Y[��RY
-	�\���]\њ[\��O˝�[YN�ۜ��H��[Y[���][[Y[��RY
-	�\���Q�[\��O˝�[Y_	��]\�H\��˙�[\�O��ۜ�HX[˙�[�
-O��YOO]�X[�Y
-N�ۜ��H�\��Y\�˙�[�
-O��YOOY˘�\��Y\��Y
-N�ۜ��[YHH��	�˜�Z_I�˛YZ_X����\��\�J
-N���Y�H	��J�]_	��K����\��\�J
-K�[��Y\�JH	��[�[YK�[��Y\�JJH�]\���[�NY�ُOOI�[�ۙI�	���ۙJH�]\���[�NY�ُOOI�ۙI�	��]�ۙJH�]\���[�NY��	����[ܚ]WOO\�H�]\���[�N�]\���YNJK��ܝ
+// ============================================================
+// ENTITY DEAL PANEL
+// ============================================================
+function makeDealCard(d) {
+  const c = customers.find(x => x.id===d.customer_id);
+  const p = properties.find(x => x.id===d.property_id);
+  const si = STAGES.indexOf(d.stage);
+  const pct = si>=0?Math.round((si+1)/STAGES.length*100):0;
+  const undone = tasks.filter(t => t.deal_id===d.id && \!t.done);
+  const over = undone.filter(t => t.due_date && new Date(t.due_date)<new Date());
+  const today = new Date(); today.setHours(0,0,0,0);
+  const due = d.deadline?new Date(d.deadline):null;
+  if(due) due.setHours(0,0,0,0);
+  const diff = due?Math.ceil((due-today)/(1000*60*60*24)):null;
+  const dueCls = diff===null?'color:var(--text3)':diff<0?'color:var(--danger);font-weight:600':diff<=7?'color:var(--warn);font-weight:600':'color:var(--text3)';
+  const dueLabel = diff===null?'期限未設定':diff<0?`${Math.abs(diff)}日超過`:diff===0?'今日':'残'+diff+'日';
+  return `<div class="deal-summary-card" onclick="closeEDP();openDP('${d.id}')">
+    <div class="dsc-top">
+      <span class="dsc-title">${c?c.sei+' '+c.mei:'—'} × ${p?.name||'—'}</span>
+      <div style="display:flex;gap:6px;align-items:center;">
+        ${over.length?`<span class="badge bg-red">期限切れ${over.length}件</span>`:''}
+        <span class="badge ${STAGE_COLORS[d.stage]||'bg-gray'}">${d.stage}</span>
+      </div>
+    </div>
+    <div class="dsc-grid">
+      <div class="dsc-row"><span class="dsc-label">業務形態</span><span class="dsc-val">${d.agency_type||'—'}</span></div>
+      <div class="dsc-row"><span class="dsc-label">取引種別</span><span class="dsc-val">${p?.deal_type||'—'}</span></div>
+      <div class="dsc-row"><span class="dsc-label">物件種別</span><span class="dsc-val">${p?.prop_type||'—'}</span></div>
+      <div class="dsc-row"><span class="dsc-label">価格</span><span class="dsc-val">${p?.price||'—'}</span></div>
+      <div class="dsc-row"><span class="dsc-label">期限</span><span class="dsc-val" style="${dueCls}">${d.deadline||'—'} ${diff\!==null?'('+dueLabel+')':''}</span></div>
+      <div class="dsc-row"><span class="dsc-label">タスク</span><span class="dsc-val">${undone.length?`未完了 ${undone.length}件`:'なし'}</span></div>
+    </div>
+    <div class="dsc-stage">
+      <span style="font-size:11px;color:var(--text2);min-width:80px;">${si+1}/${STAGES.length} ステージ</span>
+      <div class="dsc-bar"><div class="dsc-bar-fill" style="width:${pct}%"></div></div>
+      <span class="dsc-done-count">${pct}%</span>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-top:6px;">クリックして詳細を開く →</div>
+  </div>`;
+}
+function openEDPForCustomer(custId) {
+  const c = customers.find(x => x.id===custId); if(\!c) return;
+  const active = deals.filter(d => d.customer_id===custId && \!STAGES_DONE.includes(d.stage));
+  const done = deals.filter(d => d.customer_id===custId && STAGES_DONE.includes(d.stage));
+  document.getElementById('edpTitle').textContent = `${c.sei} ${c.mei} の案件`;
+  document.getElementById('edpSub').textContent = `進行$�� ${active.length}件　成約・失注 ${done.length}件`;
+  let html = (\!active.length&&\!done.length)?'<div class="empty">案件はありません</div>':'';
+  if(active.length) { html+=`<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">進行$��</div>`+active.map(d=>makeDealCard(d)).join(''); }
+  if(done.length) { html+=`<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 8px;">成約・失注</div>`+done.map(d=>makeDealCard(d)).join(''); }
+  document.getElementById('edpBody').innerHTML = html;
+  document.getElementById('edp').classList.add('open');
+}
+function openEDPForProperty(propId) {
+  const p = properties.find(x => x.id===propId); if(\!p) return;
+  const active = deals.filter(d => d.property_id===propId && \!STAGES_DONE.includes(d.stage));
+  const done = deals.filter(d => d.property_id===propId && STAGES_DONE.includes(d.stage));
+  document.getElementById('edpTitle').textContent = `${p.name} の案件`;
+  document.getElementById('edpSub').textContent = `${p.prop_type}／${p.deal_type}　${p.price}　進行中 ${active.length}件　成約・失注 ${done.length}件`;
+  let html = (\!active.length&&\!done.length)?'<div class="empty">関連する案件はありません</div>':'';
+  if(active.length) { html+=`<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">進行中</div>`+active.map(d=>makeDealCard(d)).join(''); }
+  if(done.length) { html+=`<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 8px;">成約・失注</div>`+done.map(d=>makeDealCard(d)).join(''); }
+  document.getElementById('edpBody').innerHTML = html;
+  document.getElementById('edp').classList.add('open');
+}
+function closeEDP() { document.getElementById('edp').classList.remove('open'); }
 
-K�HO��]�]JK�YW�]_	�NNNI�K[�]�]J��YW�]_	�NNNI�JN�ۜ���HH��[Y[���][[Y[��RY
-	�\����I�NY�[\��[��
-H���K�[��\�SI������[�H����\��H�[\H�����x���k��`�ࢸ�o��f�����������]\���B��ۜ��^HH�]�]J
-N��^K��]�\��
-N��K�[��\�SH\��X\
-O��ۜ�HX[˙�[�
-O��YOO]�X[�Y
-N�ۜ��H�\��Y\�˙�[�
-O��YOOY˘�\��Y\��Y
-N�ۜ�YHH�YW�]Oۙ]�]J�YW�]JN��[Y�YJHYK��]�\��
-N�ۜ�Y��HYO�X]��Z[
+// ============================================================
+// MODAL UTILS
+// ============================================================
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-YK]�^JK�L
-��
-��
-��
-JN��[�ۜ�YP��HY��OO[�[��ΙY������܎��\�KY[��\�Nٛ۝]�ZY����ΙY��OOL����܎��\�K]�\��Nٛ۝]�ZY����Ή���]\����[OH���ۙO���X�]N��N�Ή��H���]K[X�[H����x�Ȉ�[OH���ۙO��^YX�ܘ][ێ�[�K]��Y��Ή��H����]_O���]K[X�[H��b9.툈�\��H�������˜�ZJ�˛YZN���%	�O���]K[X�[H�a*�ab9n�����[��\��H��Y�H	��W���Ԕ����[ܚ]W_	ؙ�Yܘ^I�H�����[ܚ]_O��[�����]K[X�[H��'�fd���[��[OH��۝\�^�N�L���YP��H����YW�]_	��%	�O��[�����]K[X�[H���yodȈ�\��H������\��YۙY��	��%	�O���]K[X�[H�k�9.����[�]\OH��X�؛��	��ۙO���X��Y	Ή��Hۘ�[��OH����U\��	���YI�\˘�X��Y
-H��[OH��\��܎��[�\�ȏ�������JK���[�	��NB��[��[ۈ�[�\��[�[
-X[Y
-H��[Y[���][[Y[��RY
-	�\��X[Y	�K��[YHHX[Y�\��[�X[Y	����[Y[���][[Y[��RY
-	�]I�K��[YOI����[Y[���][[Y[��RY
-	�YI�K��[YHH�]�]J
-K��T����[��
-K��X�JL
-N��[Y[���][[Y[��RY
-	��I�K��[YOI�.+I���[Y[���][[Y[��RY
-	�\��Yۉ�K��[YOI�l�y�+	���[Y[���][[Y[��RY
-	�\��[�[	�K��\��\��Y
-	��[��NB�\�[���[��[ۈ�]�U\��
-H�ۜ�X[YH��[Y[���][[Y[��RY
-	�\��X[Y	�K��[YN�ۜ�X[HX[˙�[�
-O��YOOYX[Y
-N�ۜ�]HH�X[�Y�X[Y�\��Y\��Y�X[˘�\��Y\��Y�[]N���[Y[���][[Y[��RY
-	�]I�K��[YKYW�]N���[Y[���][[Y[��RY
-	�YI�K��[YK�[ܚ]N���[Y[���][[Y[��RY
-	��I�K��[YKۙN��[�K\��YۙY�Ι��[Y[���][[Y[��RY
-	�\��Yۉ�K��[YKܙX]Y�]��]�]J
-K��T����[��
-_N�ۜ��\�H]�Z]�[��	�\����]JN�\��˜\�
-�\��JN���S[�[
-	�\��[�[	�N��[�\�\���
-N��[�\�\���
-N��[�\�\���\�
-
-N�\]R�\�
-NB�\�[���[��[ۈ���U\��Y�X��Y
-H]�Z]�\
-	�\����Y�ۙN��X��YJN�ۜ�HH\��˙�[�[�^
-O��YOOZY
-N�Y�O�L
-H\����WK�ۙOX�X��Y�[�\�\���
-N��[�\�\���
-N��[�\�\���\�
-
-N�\]R�\�
-NB�\�[���[��[ۈ]ZX��ۙU\��Y�X��Y
-H�]�Z]���U\��Y�X��Y
-N�B�\�[���[��[ۈ[]U\��Y
-HY�X�ۙ�\�J	��d��k����x��हbb�fi8�e��o��fx�b��'��JH�]\��]�Z]�[
-	�\����Y
-N\���H\��˙�[\�O��YOOZY
-N��[�\�\���
-N��[�\�\���
-N�\]R�\�
-NB����OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB���P�U�UQT��OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB��[��[ۈ�[�\�X��
-H�ۜ�HH
-��[Y[���][[Y[��RY
-	�X��X\��	�O˝�[Y_	��K����\��\�J
-N�ۜ��H��[Y[���][[Y[��RY
-	�X�\Q�[\��O˝�[Y_	��]\�HX�]�]Y\˙�[\�HO��ۜ�HX[˙�[�
-O��YOOXK�X[�Y
-N�ۜ��H�\��Y\�˙�[�
-O��YOOY˘�\��Y\��YK��\��Y\��Y
-N�ۜ��[YHH��	�˜�Z_I�˛YZ_X����\��\�J
-N���Y�H	��[�[YK�[��Y\�JH	��JK���_	��K����\��\�J
-K�[��Y\�JJH�]\���[�NY��	��K�\WOO]�H�]\���[�N�]\���YNJK��ܝ
-
-K�HO��]�]J��]JK[�]�]JK�]JJN�ۜ���HH��[Y[���][[Y[��RY
-	�X���I�NY�[\��[��
-H���K�[��\�SI������[�H����\��H�[\H��*&:c,��k��`�ࢸ�o��f�����������]\���B��ۜ�\P��ܜ�H��f��*lIΉؙ�X�YI�	��iyn��Ήؙ�XX��[�	�	�a�z)��Ήؙ�^Y[���	���x��8���Ήؙ�Yܘ^I�	��gx�k�.�Ήؙ�Yܘ^I�N��K�[��\�SH\��X\
-HO��ۜ�HX[˙�[�
-O��YOOXK�X[�Y
-N�ۜ��H�\��Y\�˙�[�
-O��YOOY˘�\��Y\��Y
-N�ۜ�H��\�Y\˙�[�
-O��YOOY˜��\�W�Y
-N�ۜ��X��X�HH�ۘ�X��H��[�
-	���YI�H��[OH��\��܎��[�\�Ȉ]OH��b9.��*l��,8ऺe���cȘ����]\���	��X��X�_O��]K[X�[H���y�`���\��H�����K�]_	��%	�O���]K[X�[H��+�hg����[��\��H��Y�H	�\P��ܜ��K�\W_	ؙ�Yܘ^I�H���K�\_O��[�����]K[X�[H�hi�k���������ۙω�˜�Z_H	�˛YZ_O���ۙϘ���%	�O���]K[X�[H��b9.툏����[��\��H��Y�H	��Q�W���Ԕ����Y�W_	ؙ�Yܘ^I�H��[OH�X\��[�\�Y��ȏ����Y�_O��[���[��\��H����[OH��۝\�^�N�L�ȏ��˛�[Y_	��%	�O��[�����%	�O���]K[X�[H�a�yk�H���K���_	��%	�O���]K[X�[H���yodȈ�\��H�����K��Y��	��%	�O������JK���[�	��NB��[��[ۈ�[�X�[�[
-X[Y
-H��[Y[���][[Y[��RY
-	�X�X[Y	�K��[YHHX[Y�\��[�X[Y	����[Y[���][[Y[��RY
-	�Q]I�K��[YHH�]�]J
-K��T����[��
-K��X�JL
-N��[Y[���][[Y[��RY
-	�S��I�K��[YOI����[Y[���][[Y[��RY
-	�T�Y���K��[YOI�l�y�+	���[Y[���][[Y[��RY
-	�X�[�[	�K��\��\��Y
-	��[��NB�\�[���[��[ۈ�]�PX�
-
-H�ۜ�X[YH��[Y[���][[Y[��RY
-	�X�X[Y	�K��[YN�ۜ�X[HX[˙�[�
-O��YOOYX[Y
-N�ۜ�]HH�X[�Y�X[Y�\��Y\��Y�X[˘�\��Y\��Y�[\N���[Y[���][[Y[��RY
-	�U\I�K��[YK]N���[Y[���][[Y[��RY
-	�Q]I�K��[YK��N���[Y[���][[Y[��RY
-	�S��I�K��[YK�Y�����[Y[���][[Y[��RY
-	�T�Y���K��[YKܙX]Y�]��]�]J
-K��T����[��
-_N�ۜ��\�H]�Z]�[��	�X�]�]Y\��]JN�X�]�]Y\˝[��Y�
-�\��JN���S[�[
-	�X�[�[	�N��[�\�X��
-N��[�\�X��
-N��[�\�\���\�
-
-NB�\�[���[��[ۈ[]PX�
-Y
-HY�X�ۙ�\�J	��d��k��.�b�z*&:c,�हbb�fi8�e��o��fx�b��'��JH�]\��]�Z]�[
-	�X�]�]Y\��Y
-NX�]�]Y\�HX�]�]Y\˙�[\�O��YOOZY
-N��[�\�X��
-N��[�\�X��
-NB����OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB���S�UHPSS�S���OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB��[��[ۈXZ�QX[�\�
-
-H�ۜ��H�\��Y\�˙�[�
-O��YOOY��\��Y\��Y
-N�ۜ�H��\�Y\˙�[�
-O��YOOY���\�W�Y
-N�ۜ��HH�Q�T˚[�^ي��Y�JN�ۜ��H�O�L�X]���[�
-
-�J�JK��Q�T˛[��
-�L
-N��ۜ�[�ۙHH\��˙�[\�O��X[�YOOY�Y	��]�ۙJN�ۜ�ݙ\�H[�ۙK��[\�O��YW�]H	���]�]J�YW�]JO�]�]J
-JN�ۜ��^HH�]�]J
-N��^K��]�\��
-N�ۜ�YHH�XY[�Oۙ]�]J�XY[�JN��[Y�YJHYK��]�\��
-N�ۜ�Y��HYO�X]��Z[
-
-YK]�^JK�L
-��
-��
-��
-JN��[�ۜ�YP��HY��OO[�[����܎��\�K]^�IΙY������܎��\�KY[��\�Nٛ۝]�ZY���	ΙY��M�����܎��\�K]�\��Nٛ۝]�ZY���	Ή���܎��\�K]^�I��ۜ�YSX�[HY��OO[�[���'�fd9�*�*+yk��ΙY���	�X]�X��Y��_y��z-�z`c��Y��OOL��.⹥�IΉ������Y������I��]\��]��\��H�X[\�[[X\�KX�\��ۘ�X��H����QQ
-
-N��[�
-	���YI�H���]��\��H���]�����[��\��H���]]H�����˜�ZJ��	��˛YZN���%	�H0��	�˛�[Y_	��%	�O��[���]��[OH�\�^N��^��\���[YۋZ][\Θ�[�\�ȏ��	�ݙ\��[����[��\��H��Y�H��\�Y���'�fd9b!��	�ݙ\��[��y.���[�����B��[��\��H��Y�H	��Q�W���Ԕ����Y�W_	ؙ�Yܘ^I�H�����Y�_O��[����]����]���]��\��H���YܚY���]��\��H���\��ȏ��[��\��H���[X�[���kyb�yoh��b���[���[��\��H���]�[����Y�[��W�\_	��%	�O��[���]���]��\��H���\��ȏ��[��\��H���[X�[��c�o%y�+�b)O��[���[��\��H���]�[���˙X[�\_	��%	�O��[���]���]��\��H���\��ȏ��[��\��H���[X�[���jy.���+�b)O��[���[��\��H���]�[���˜���\_	��%	�O��[���]���]��\��H���\��ȏ��[��\��H���[X�[��/�y�/��[���[��\��H���]�[���˜�X�_	��%	�O��[���]���]��\��H���\��ȏ��[��\��H���[X�[���'�fd��[���[��\��H���]�[��[OH��YP��H����XY[�_	��%	�H	�Y��OO[�[��	��YSX�[
-��IΉ��O��[���]���]��\��H���\��ȏ��[��\��H���[X�[�����x����[���[��\��H���]�[���[�ۙK�[���9�*�k�9.��	�[�ۙK�[��y.����j��e��O��[���]����]���]��\��H���\�Y�H����[��[OH��۝\�^�N�L\���܎��\�K]^�N�Z[�]�Y�ȏ���J�_K���Q�T˛[��H8�x����8���[���]��\��H���X�\���]��\��H���X�\�Y�[��[OH��Y���IH���]���]����[��\��H���YۙKX��[�����IO��[����]���]��[OH��۝\�^�N�L\���܎��\�K]^�N�X\��[�]���ȏ�����������e��i�*l��,8ऺe���c�8����]����]��B��[��[ۈ�[�Q�ܐ�\��Y\��\�Y
-H�ۜ��H�\��Y\�˙�[�
-O��YOOX�\�Y
-N�Y�X�H�]\���ۜ�X�]�HHX[˙�[\�O���\��Y\��YOOX�\�Y	��T�Q�T��ӑK�[��Y\���Y�JJN�ۜ�ۙHHX[˙�[\�O���\��Y\��YOOX�\�Y	���Q�T��ӑK�[��Y\���Y�JJN��[Y[���][[Y[��RY
-	�Y]I�K�^�۝[�H	�˜�Z_H	�˛YZ_H8�k��b9.���[Y[���][[Y[��RY
-	�Y�X��K�^�۝[�H:`,�(c	.+H	�X�]�K�[��y.��� 9�$9�!8���i,y��	�ۙK�[��y.�][H
-XX�]�K�[��	��YۙK�[��
-O��]��\��H�[\H���b9.���k��`�ࢸ�o��f����]��Ή��Y�X�]�K�[��
-H�[
-�X]��[OH��۝\�^�N�L\ٛ۝]�ZY������܎��\�K]^�N�^]�[�ٛܛN�\\��\�N�]\�\�X�[�΋�
-�[N�X\��[�X���N�ȏ�`,�(c	.+O�]��
-�X�]�K�X\
-O�XZ�QX[�\�
-
-JK���[�	��N�B�Y�ۙK�[��
-H�[
-�X]��[OH��۝\�^�N�L\ٛ۝]�ZY������܎��\�K]^�N�^]�[�ٛܛN�\\��\�N�]\�\�X�[�΋�
-�[N�X\��[��Mȏ��$9�!8���i,y���]��
-�ۙK�X\
-O�XZ�QX[�\�
-
-JK���[�	��N�B���[Y[���][[Y[��RY
-	�Y��I�K�[��\�SH[��[Y[���][[Y[��RY
-	�Y	�K��\��\��Y
-	��[��NB��[��[ۈ�[�Q�ܔ��\�J��Y
-H�ۜ�H��\�Y\˙�[�
-O��YOO\��Y
-N�Y�\
-H�]\���ۜ�X�]�HHX[˙�[\�O����\�W�YOO\��Y	��T�Q�T��ӑK�[��Y\���Y�JJN�ۜ�ۙHHX[˙�[\�O����\�W�YOO\��Y	���Q�T��ӑK�[��Y\���Y�JJN��[Y[���][[Y[��RY
-	�Y]I�K�^�۝[�H	���[Y_H8�k��b9.���[Y[���][[Y[��RY
-	�Y�X��K�^�۝[�H	�����\_{�#���X[�\_x� 	���X�_x� :`,�(c9.+H	�X�]�K�[��y.��� 9�$9�!8���i,y��	�ۙK�[��y.�][H
-XX�]�K�[��	��YۙK�[��
-O��]��\��H�[\H��e��`(��fx���b9.���k��`�ࢸ�o��f����]��Ή��Y�X�]�K�[��
-H�[
-�X]��[OH��۝\�^�N�L\ٛ۝]�ZY������܎��\�K]^�N�^]�[�ٛܛN�\\��\�N�]\�\�X�[�΋�
-�[N�X\��[�X���N�ȏ�`,�(c9.+O�]��
-�X�]�K�X\
-O�XZ�QX[�\�
-
-JK���[�	��N�B�Y�ۙK�[��
-H�[
-�X]��[OH��۝\�^�N�L\ٛ۝]�ZY������܎��\�K]^�N�^]�[�ٛܛN�\\��\�N�]\�\�X�[�΋�
-�[N�X\��[��Mȏ��$9�!8���i,y���]��
-�ۙK�X\
-O�XZ�QX[�\�
-
-JK���[�	��N�B���[Y[���][[Y[��RY
-	�Y��I�K�[��\�SH[��[Y[���][[Y[��RY
-	�Y	�K��\��\��Y
-	��[��NB��[��[ۈ���QQ
-
-H���[Y[���][[Y[��RY
-	�Y	�K��\��\���[[ݙJ	��[��N�B����OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB���S�SUS��OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB��[��[ۈ���S[�[
-Y
-H���[Y[���][[Y[��RY
-Y
-K��\��\���[[ݙJ	��[��N�B����OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB���S�U���OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOB�]]�ې]]�]P�[��Y
-\�\�O�Y�\�\�H��[Y[���][[Y[��RY
-	�ٕ\�\��K�^�۝[�H\�\��\�^S�[Y_\�\��[XZ[��[Y[���][[Y[��RY
-	���[��Y]��K��[K�\�^OIۛۙI���[Y[���][[Y[��RY
-	�\�[	�K��[K�\�^OI���Y[
-
-N��]�	�\���\�	�NB�JN��ܚ\��؛�O���[
+// ============================================================
+// INIT
+// ============================================================
+auth.onAuthStateChanged(user => {
+  if(user) {
+    document.getElementById('sfUser').textContent = user.displayName||user.email;
+    document.getElementById('loginView').style.display='none';
+    document.getElementById('appShell').style.display='';
+    loadAll(); nav('dashboard');
+  }
+});
+</script>
+</body>
+</html>
