@@ -801,7 +801,7 @@ const NO_ORDER_COLS = ['deal_checklist'];
 async function dbGet(col, q={}) {
   let query = db.collection(col);
   if(q.eq) Object.entries(q.eq).forEach(([k,v]) => { query = query.where(k,'==',v); });
-  if(\!NO_ORDER_COLS.includes(col)) query = query.orderBy('created_at','desc');
+  if(!NO_ORDER_COLS.includes(col)) query = query.orderBy('created_at','desc');
   const snap = await query.get();
   return snap.docs.map(d => ({id: d.id, ...d.data()}));
 }
@@ -820,7 +820,7 @@ async function dbUpsert(col, data, conflictKey) {
   let query = db.collection(col);
   fields.forEach(f => { query = query.where(f,'==',data[f]); });
   const snap = await query.get();
-  if(\!snap.empty) {
+  if(!snap.empty) {
     await snap.docs[0].ref.update(data);
     return [{id: snap.docs[0].id, ...data}];
   }
@@ -893,19 +893,19 @@ function openAdd() {
 // DASHBOARD
 // ============================================================
 function updateKPIs() {
-  const active = deals.filter(d => \!STAGES_DONE.includes(d.stage));
+  const active = deals.filter(d => !STAGES_DONE.includes(d.stage));
   document.getElementById('kTotal').textContent = deals.length;
   document.getElementById('kActive').textContent = active.length;
-  document.getElementById('kTask').textContent = tasks.filter(t => \!t.done).length;
+  document.getElementById('kTask').textContent = tasks.filter(t => !t.done).length;
   const now = new Date();
   document.getElementById('kClosed').textContent = deals.filter(d => d.stage==='成約' && new Date(d.created_at).getMonth()===now.getMonth()).length;
 }
 
 function renderDashboard() {
   const today = new Date(); today.setHours(0,0,0,0);
-  const urgent = tasks.filter(t => \!t.done).sort((a,b) => new Date(a.due_date)-new Date(b.due_date)).slice(0,6);
+  const urgent = tasks.filter(t => !t.done).sort((a,b) => new Date(a.due_date)-new Date(b.due_date)).slice(0,6);
   const tl = document.getElementById('todayTasksList');
-  if(\!urgent.length) { tl.innerHTML='<div class="empty" style="padding:12px;">未完了タスクはありません</div>'; }
+  if(!urgent.length) { tl.innerHTML='<div class="empty" style="padding:12px;">未完了タスクはありません</div>'; }
   else {
     tl.innerHTML = urgent.map(t => {
       const deal = deals.find(d => d.id===t.deal_id);
@@ -923,8 +923,8 @@ function renderDashboard() {
     }).join('');
   }
   const rd = document.getElementById('recentDealsList');
-  const recent = [...deals].filter(d => \!STAGES_DONE.includes(d.stage)).sort((a,b) => new Date(b.created_at)-new Date(a.created_at)).slice(0,5);
-  if(\!recent.length) { rd.innerHTML='<div class="empty" style="padding:12px;">案件はありません</div>'; }
+  const recent = [...deals].filter(d => !STAGES_DONE.includes(d.stage)).sort((a,b) => new Date(b.created_at)-new Date(a.created_at)).slice(0,5);
+  if(!recent.length) { rd.innerHTML='<div class="empty" style="padding:12px;">案件はありません</div>'; }
   else {
     rd.innerHTML = recent.map(d => {
       const c = customers.find(x => x.id===d.customer_id);
@@ -958,8 +958,8 @@ function renderDeals() {
     const p = properties.find(x => x.id===d.property_id);
     const name = c?`${c.sei}${c.mei}`.toLowerCase():'';
     const pname = (p?.name||'').toLowerCase();
-    if(q && \!name.includes(q) && \!pname.includes(q)) return false;
-    if(tf && p?.deal_type\!==tf) return false;
+    if(q && !name.includes(q) && !pname.includes(q)) return false;
+    if(tf && p?.deal_type!==tf) return false;
     return true;
   };
   const showDone = sf==='done';
@@ -992,7 +992,7 @@ function renderDeals() {
 function dealCard(d) {
   const c = customers.find(x => x.id===d.customer_id);
   const p = properties.find(x => x.id===d.property_id);
-  const undone = tasks.filter(t => t.deal_id===d.id && \!t.done);
+  const undone = tasks.filter(t => t.deal_id===d.id && !t.done);
   const over = undone.filter(t => t.due_date && new Date(t.due_date)<new Date());
   const mustUncheck = getUncheckedMust(d);
   return `<div class="dcard" onclick="openDP('${d.id}')">
@@ -1010,7 +1010,7 @@ function dealCard(d) {
 
 function getUncheckedMust(d) {
   const items = COMPLIANCE[d.stage]||[];
-  return items.filter(i => i.req && \!checklists.find(c => c.deal_id===d.id && c.item_key===i.key && c.checked)).length>0;
+  return items.filter(i => i.req && !checklists.find(c => c.deal_id===d.id && c.item_key===i.key && c.checked)).length>0;
 }
 
 // ============================================================
@@ -1018,7 +1018,7 @@ function getUncheckedMust(d) {
 // ============================================================
 function openDP(id) {
   currentDealId = id;
-  const d = deals.find(x => x.id===id); if(\!d) return;
+  const d = deals.find(x => x.id===id); if(!d) return;
   const c = customers.find(x => x.id===d.customer_id);
   const p = properties.find(x => x.id===d.property_id);
   document.getElementById('dpTitle').textContent = `${c?c.sei+' '+c.mei:'—'} × ${p?.name||'—'}`;
@@ -1076,13 +1076,13 @@ function dpTab(t) {
 
 // CHECKLIST
 function renderDPCheck() {
-  const d = deals.find(x => x.id===currentDealId); if(\!d) return;
+  const d = deals.find(x => x.id===currentDealId); if(!d) return;
   const items = COMPLIANCE[d.stage]||[];
-  const mustUncheck = items.filter(i => i.req && \!checklists.find(c => c.deal_id===d.id && c.item_key===i.key && c.checked));
+  const mustUncheck = items.filter(i => i.req && !checklists.find(c => c.deal_id===d.id && c.item_key===i.key && c.checked));
   let html = '';
   if(mustUncheck.length) html += `<div class="warn-box">義務対応が${mustUncheck.length}件未完了です。次のステージに進む前に完了してください。</div>`;
   html += `<div style="font-size:11px;color:var(--text3);margin-bottom:8px;">現在のステージ：<strong style="color:var(--text1);">${d.stage}</strong></div>`;
-  if(\!items.length) { html+='<div style="font-size:12px;color:var(--text3);">このステージのチェック項目はありません</div>'; }
+  if(!items.length) { html+='<div style="font-size:12px;color:var(--text3);">このステージのチェック項目はありません</div>'; }
   else {
     html += '<div>'+items.map(i => {
       const chk = checklists.find(c => c.deal_id===d.id && c.item_key===i.key);
@@ -1109,7 +1109,7 @@ function renderDPCheck() {
 }
 
 async function toggleCheck(key, stage, checked) {
-  const d = deals.find(x => x.id===currentDealId); if(\!d) return;
+  const d = deals.find(x => x.id===currentDealId); if(!d) return;
   const data = {deal_id:d.id, stage, item_key:key, checked, checked_by:'岩本', checked_at:new Date().toISOString()};
   await dbUpsert('deal_checklist', data, 'deal_id,item_key');
   checklists = await dbGet('deal_checklist');
@@ -1120,7 +1120,7 @@ async function toggleCheck(key, stage, checked) {
 function renderDPTasks() {
   const list = tasks.filter(t => t.deal_id===currentDealId).sort((a,b) => new Date(a.due_date)-new Date(b.due_date));
   const el = document.getElementById('dpTaskList');
-  if(\!list.length) { el.innerHTML='<div style="font-size:12px;color:var(--text3);">タスクはありません</div>'; return; }
+  if(!list.length) { el.innerHTML='<div style="font-size:12px;color:var(--text3);">タスクはありません</div>'; return; }
   el.innerHTML = list.map(t => {
     const due = t.due_date?new Date(t.due_date):null;
     const diff = due?Math.ceil((due-new Date())/(1000*60*60*24)):null;
@@ -1145,7 +1145,7 @@ function renderDPTasks() {
 function renderDPActs() {
   const list = activities.filter(a => a.deal_id===currentDealId).sort((a,b) => new Date(b.date)-new Date(a.date));
   const el = document.getElementById('dpActList');
-  if(\!list.length) { el.innerHTML='<div style="font-size:12px;color:var(--text3);">活動記録はありません</div>'; return; }
+  if(!list.length) { el.innerHTML='<div style="font-size:12px;color:var(--text3);">活動記録はありません</div>'; return; }
   const typeColors = {'電話':'bg-blue','来店':'bg-accent','内見':'bg-yellow','メール':'bg-gray','その他':'bg-gray'};
   el.innerHTML = list.map(a => `
     <div class="act-item">
@@ -1167,7 +1167,7 @@ function renderDPActs() {
 async function renderDPFiles() {
   const list = files.filter(f => f.deal_id===currentDealId);
   const el = document.getElementById('dpFileList');
-  if(\!list.length) { el.innerHTML='<div style="font-size:12px;color:var(--text3);">ファイルはありません</div>'; return; }
+  if(!list.length) { el.innerHTML='<div style="font-size:12px;color:var(--text3);">ファイルはありません</div>'; return; }
   const urls = await Promise.all(list.map(f => storageUrl(f.storage_path)));
   el.innerHTML = list.map((f,i) => {
     const icon = f.file_type==='pdf'?'PDF':f.file_type==='image'?'IMG':'FILE';
@@ -1182,7 +1182,7 @@ async function renderDPFiles() {
 }
 
 async function uploadFile(e) {
-  const file = e.target.files[0]; if(\!file||\!currentDealId) return;
+  const file = e.target.files[0]; if(!file||!currentDealId) return;
   const ext = file.name.split('.').pop().toLowerCase();
   const ftype = ['pdf'].includes(ext)?'pdf':['jpg','jpeg','png','gif','webp'].includes(ext)?'image':'other';
   const path = `deals/${currentDealId}/${Date.now()}_${file.name}`;
@@ -1193,16 +1193,16 @@ async function uploadFile(e) {
   e.target.value=''; renderDPFiles();
 }
 async function deleteFile(id) {
-  if(\!confirm('このファイルを削除しますか？')) return;
+  if(!confirm('このファイルを削除しますか？')) return;
   await dbDel('deal_files', id);
-  files = files.filter(x => x.id\!==id); renderDPFiles();
+  files = files.filter(x => x.id!==id); renderDPFiles();
 }
 
 // ============================================================
 // STAGE ADVANCE
 // ============================================================
 function advanceStage() {
-  const d = deals.find(x => x.id===currentDealId); if(\!d) return;
+  const d = deals.find(x => x.id===currentDealId); if(!d) return;
   const si = STAGES.indexOf(d.stage);
   if(si<0) { alert('このステージは進められません'); return; }
   if(si>=STAGES.length-1) {
@@ -1263,7 +1263,7 @@ async function saveDeal() {
     deadline: document.getElementById('dDeadline').value,
     memo: document.getElementById('dMemo').value
   };
-  if(\!data.customer_id||\!data.property_id) { alert('顧客と物件を選択してください'); return; }
+  if(!data.customer_id||!data.property_id) { alert('顧客と物件を選択してください'); return; }
   if(id) {
     await dbUpd('deals', id, data);
     const i = deals.findIndex(x => x.id===id); if(i>=0) deals[i]={...deals[i],...data};
@@ -1281,15 +1281,15 @@ function renderCusts() {
   const q = (document.getElementById('custSearch')?.value||'').toLowerCase();
   const rf = document.getElementById('custRoleFilter')?.value||'';
   let list = customers.filter(c => {
-    if(q && \!`${c.sei}${c.mei}`.toLowerCase().includes(q) && \!(c.tel||'').includes(q)) return false;
-    if(rf && c.role\!==rf) return false;
+    if(q && !`${c.sei}${c.mei}`.toLowerCase().includes(q) && !(c.tel||'').includes(q)) return false;
+    if(rf && c.role!==rf) return false;
     return true;
   });
   const tbody = document.getElementById('custTbody');
-  if(\!list.length) { tbody.innerHTML='<tr><td colspan="7" class="empty">該当なし</td></tr>'; return; }
+  if(!list.length) { tbody.innerHTML='<tr><td colspan="7" class="empty">該当なし</td></tr>'; return; }
   tbody.innerHTML = list.map(c => {
     const dealCnt = deals.filter(d => d.customer_id===c.id).length;
-    const activeCnt = deals.filter(d => d.customer_id===c.id && \!STAGES_DONE.includes(d.stage)).length;
+    const activeCnt = deals.filter(d => d.customer_id===c.id && !STAGES_DONE.includes(d.stage)).length;
     return `<tr onclick="openEDPForCustomer('${c.id}')" style="cursor:pointer;">
       <td data-label="氏名"><strong>${c.sei} ${c.mei}</strong></td>
       <td data-label="電話" class="t2">${c.tel||'—'}</td>
@@ -1336,12 +1336,12 @@ function renderProps() {
   const dtf = document.getElementById('propDealFilter')?.value||'';
   const hideClosed = document.getElementById('propHideClosed')?.checked||false;
   const all = properties.filter(p => {
-    if(q && \!(p.name||'').toLowerCase().includes(q) && \!(p.addr||'').toLowerCase().includes(q)) return false;
-    if(ptf && p.prop_type\!==ptf) return false;
-    if(dtf && p.deal_type\!==dtf) return false;
+    if(q && !(p.name||'').toLowerCase().includes(q) && !(p.addr||'').toLowerCase().includes(q)) return false;
+    if(ptf && p.prop_type!==ptf) return false;
+    if(dtf && p.deal_type!==dtf) return false;
     return true;
   });
-  const list = hideClosed?all.filter(p => p.status\!=='成約'):all;
+  const list = hideClosed?all.filter(p => p.status!=='成約'):all;
   const hiddenCount = all.length-list.length;
   const countEl = document.getElementById('propCount');
   if(countEl) {
@@ -1350,9 +1350,9 @@ function renderProps() {
       : `${list.length}件`;
   }
   const grid = document.getElementById('propGrid');
-  if(\!list.length) { grid.innerHTML=`<div class="empty" style="grid-column:1/-1;">${hideClosed?'成約以外の':''}該当する物件がありません</div>`; return; }
+  if(!list.length) { grid.innerHTML=`<div class="empty" style="grid-column:1/-1;">${hideClosed?'成約以外の':''}該当する物件がありません</div>`; return; }
   grid.innerHTML = list.map(p => {
-    const activeCnt = deals.filter(d => d.property_id===p.id && \!STAGES_DONE.includes(d.stage)).length;
+    const activeCnt = deals.filter(d => d.property_id===p.id && !STAGES_DONE.includes(d.stage)).length;
     return `<div class="pc" onclick="openEDPForProperty('${p.id}')">
       <div class="pc-img">${p.prop_type}／${p.deal_type}</div>
       <div class="pc-body">
@@ -1417,14 +1417,14 @@ function renderTasks() {
     const d = deals.find(x => x.id===t.deal_id);
     const c = customers.find(x => x.id===d?.customer_id);
     const name = c?`${c.sei}${c.mei}`.toLowerCase():'';
-    if(q && \!(t.title||'').toLowerCase().includes(q) && \!name.includes(q)) return false;
+    if(q && !(t.title||'').toLowerCase().includes(q) && !name.includes(q)) return false;
     if(sf==='undone' && t.done) return false;
-    if(sf==='done' && \!t.done) return false;
-    if(pf && t.priority\!==pf) return false;
+    if(sf==='done' && !t.done) return false;
+    if(pf && t.priority!==pf) return false;
     return true;
   }).sort((a,b) => new Date(a.due_date||'9999')-new Date(b.due_date||'9999'));
   const tbody = document.getElementById('taskTbody');
-  if(\!list.length) { tbody.innerHTML='<tr><td colspan="6" class="empty">タスクはありません</td></tr>'; return; }
+  if(!list.length) { tbody.innerHTML='<tr><td colspan="6" class="empty">タスクはありません</td></tr>'; return; }
   const today = new Date(); today.setHours(0,0,0,0);
   tbody.innerHTML = list.map(t => {
     const d = deals.find(x => x.id===t.deal_id);
@@ -1465,9 +1465,9 @@ async function toggleTask(id, checked) {
 }
 async function quickDoneTask(id, checked) { await toggleTask(id, checked); }
 async function deleteTask(id) {
-  if(\!confirm('このタスクを削除しますか？')) return;
+  if(!confirm('このタスクを削除しますか？')) return;
   await dbDel('tasks', id);
-  tasks = tasks.filter(x => x.id\!==id); renderTasks(); renderDPTasks(); updateKPIs();
+  tasks = tasks.filter(x => x.id!==id); renderTasks(); renderDPTasks(); updateKPIs();
 }
 
 // ============================================================
@@ -1480,12 +1480,12 @@ function renderActs() {
     const d = deals.find(x => x.id===a.deal_id);
     const c = customers.find(x => x.id===d?.customer_id||a.customer_id);
     const name = c?`${c.sei}${c.mei}`.toLowerCase():'';
-    if(q && \!name.includes(q) && \!(a.note||'').toLowerCase().includes(q)) return false;
-    if(tf && a.type\!==tf) return false;
+    if(q && !name.includes(q) && !(a.note||'').toLowerCase().includes(q)) return false;
+    if(tf && a.type!==tf) return false;
     return true;
   }).sort((a,b) => new Date(b.date)-new Date(a.date));
   const tbody = document.getElementById('actTbody');
-  if(\!list.length) { tbody.innerHTML='<tr><td colspan="6" class="empty">記録はありません</td></tr>'; return; }
+  if(!list.length) { tbody.innerHTML='<tr><td colspan="6" class="empty">記録はありません</td></tr>'; return; }
   const typeColors = {'電話':'bg-blue','来店':'bg-accent','内見':'bg-yellow','メール':'bg-gray','その他':'bg-gray'};
   tbody.innerHTML = list.map(a => {
     const d = deals.find(x => x.id===a.deal_id);
@@ -1517,9 +1517,9 @@ async function saveAct() {
   closeModal('actModal'); renderActs(); renderDPActs(); renderDashboard();
 }
 async function deleteAct(id) {
-  if(\!confirm('この活動記録を削除しますか？')) return;
+  if(!confirm('この活動記録を削除しますか？')) return;
   await dbDel('activities', id);
-  activities = activities.filter(x => x.id\!==id); renderActs(); renderDPActs();
+  activities = activities.filter(x => x.id!==id); renderActs(); renderDPActs();
 }
 
 // ============================================================
@@ -1530,7 +1530,7 @@ function makeDealCard(d) {
   const p = properties.find(x => x.id===d.property_id);
   const si = STAGES.indexOf(d.stage);
   const pct = si>=0?Math.round((si+1)/STAGES.length*100):0;
-  const undone = tasks.filter(t => t.deal_id===d.id && \!t.done);
+  const undone = tasks.filter(t => t.deal_id===d.id && !t.done);
   const over = undone.filter(t => t.due_date && new Date(t.due_date)<new Date());
   const today = new Date(); today.setHours(0,0,0,0);
   const due = d.deadline?new Date(d.deadline):null;
@@ -1551,7 +1551,7 @@ function makeDealCard(d) {
       <div class="dsc-row"><span class="dsc-label">取引種別</span><span class="dsc-val">${p?.deal_type||'—'}</span></div>
       <div class="dsc-row"><span class="dsc-label">物件種別</span><span class="dsc-val">${p?.prop_type||'—'}</span></div>
       <div class="dsc-row"><span class="dsc-label">価格</span><span class="dsc-val">${p?.price||'—'}</span></div>
-      <div class="dsc-row"><span class="dsc-label">期限</span><span class="dsc-val" style="${dueCls}">${d.deadline||'—'} ${diff\!==null?'('+dueLabel+')':''}</span></div>
+      <div class="dsc-row"><span class="dsc-label">期限</span><span class="dsc-val" style="${dueCls}">${d.deadline||'—'} ${diff!==null?'('+dueLabel+')':''}</span></div>
       <div class="dsc-row"><span class="dsc-label">タスク</span><span class="dsc-val">${undone.length?`未完了 ${undone.length}件`:'なし'}</span></div>
     </div>
     <div class="dsc-stage">
@@ -1563,24 +1563,24 @@ function makeDealCard(d) {
   </div>`;
 }
 function openEDPForCustomer(custId) {
-  const c = customers.find(x => x.id===custId); if(\!c) return;
-  const active = deals.filter(d => d.customer_id===custId && \!STAGES_DONE.includes(d.stage));
+  const c = customers.find(x => x.id===custId); if(!c) return;
+  const active = deals.filter(d => d.customer_id===custId && !STAGES_DONE.includes(d.stage));
   const done = deals.filter(d => d.customer_id===custId && STAGES_DONE.includes(d.stage));
   document.getElementById('edpTitle').textContent = `${c.sei} ${c.mei} の案件`;
   document.getElementById('edpSub').textContent = `進行$�� ${active.length}件　成約・失注 ${done.length}件`;
-  let html = (\!active.length&&\!done.length)?'<div class="empty">案件はありません</div>':'';
+  let html = (!active.length&&!done.length)?'<div class="empty">案件はありません</div>':'';
   if(active.length) { html+=`<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">進行$��</div>`+active.map(d=>makeDealCard(d)).join(''); }
   if(done.length) { html+=`<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 8px;">成約・失注</div>`+done.map(d=>makeDealCard(d)).join(''); }
   document.getElementById('edpBody').innerHTML = html;
   document.getElementById('edp').classList.add('open');
 }
 function openEDPForProperty(propId) {
-  const p = properties.find(x => x.id===propId); if(\!p) return;
-  const active = deals.filter(d => d.property_id===propId && \!STAGES_DONE.includes(d.stage));
+  const p = properties.find(x => x.id===propId); if(!p) return;
+  const active = deals.filter(d => d.property_id===propId && !STAGES_DONE.includes(d.stage));
   const done = deals.filter(d => d.property_id===propId && STAGES_DONE.includes(d.stage));
   document.getElementById('edpTitle').textContent = `${p.name} の案件`;
   document.getElementById('edpSub').textContent = `${p.prop_type}／${p.deal_type}　${p.price}　進行中 ${active.length}件　成約・失注 ${done.length}件`;
-  let html = (\!active.length&&\!done.length)?'<div class="empty">関連する案件はありません</div>':'';
+  let html = (!active.length&&!done.length)?'<div class="empty">関連する案件はありません</div>':'';
   if(active.length) { html+=`<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">進行中</div>`+active.map(d=>makeDealCard(d)).join(''); }
   if(done.length) { html+=`<div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 8px;">成約・失注</div>`+done.map(d=>makeDealCard(d)).join(''); }
   document.getElementById('edpBody').innerHTML = html;
