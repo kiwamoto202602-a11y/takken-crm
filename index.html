@@ -573,6 +573,12 @@ select.fs{padding:7px 9px;border:1px solid var(--border);border-radius:var(--rs)
 </div>
 
 <script>
+// Move modals to body so they are not hidden by parent display:none
+['dealModal','custModal','propModal','taskModal','actModal','stageModal','failModal','closeDealModal'].forEach(function(id){
+  var m = document.getElementById(id);
+  if (m && m.parentElement !== document.body) document.body.appendChild(m);
+});
+
 const firebaseConfig = {
   apiKey: "AIzaSyA8hhIo_WwT51UcKzcRJ9AAumDQHEU5FnE",
   authDomain: "takken-crm.firebaseapp.com",
