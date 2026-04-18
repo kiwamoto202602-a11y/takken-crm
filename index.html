@@ -574,10 +574,15 @@ select.fs{padding:7px 9px;border:1px solid var(--border);border-radius:var(--rs)
 
 <script>
 // Move modals to body so they are not hidden by parent display:none
-['dealModal','custModal','propModal','taskModal','actModal','stageModal','failModal','closeDealModal'].forEach(function(id){
-  var m = document.getElementById(id);
-  if (m && m.parentElement !== document.body) document.body.appendChild(m);
-});
+var MODAL_IDS = ['dealModal','custModal','propModal','taskModal','actModal','stageModal','failModal','closeDealModal'];
+function moveModalsToBody() {
+  MODAL_IDS.forEach(function(id) {
+    var m = document.getElementById(id);
+    if (m && m.parentElement !== document.body) document.body.appendChild(m);
+  });
+}
+moveModalsToBody();
+new MutationObserver(moveModalsToBody).observe(document.documentElement, {childList: true, subtree: true});
 
 const firebaseConfig = {
   apiKey: "AIzaSyA8hhIo_WwT51UcKzcRJ9AAumDQHEU5FnE",
