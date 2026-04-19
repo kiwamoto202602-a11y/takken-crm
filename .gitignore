@@ -1,0 +1,38 @@
+# 環境変数ファイル（機密情報を含む可能性があるため必ずブロック）
+.env
+.env.local
+.env.production
+.env.development
+.env.*.local
+
+# 認証情報
+credentials/
+*.pem
+*.key
+service-account*.json
+firebase-adminsdk-*.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# エディタ
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node
+node_modules/
+npm-debug.log*
+
+# ビルド成果物
+dist/
+build/
+
+# ログ
+*.log
+
+# 一時ファイル
+*.tmp
+*.bak
