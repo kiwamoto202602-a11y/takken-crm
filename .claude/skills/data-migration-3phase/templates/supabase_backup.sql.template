@@ -1,0 +1,19 @@
+-- Supabase Phase 1 Backup Template
+-- Usage: psql "$DATABASE_URL" -f supabase_backup.sql > ./backups/<YYYYMMDD-HHMM>/data.sql
+-- Replace <TABLES> with actual table names
+
+-- 1. Schema dump (run separately)
+-- pg_dump "$DATABASE_URL" --schema-only --schema=public > ./backups/<YYYYMMDD-HHMM>/schema.sql
+
+-- 2. Data dump per table (JSONL format for re-import flexibility)
+\copy (SELECT row_to_json(t) FROM public.<TABLE_NAME> t) TO './backups/<YYYYMMDD-HHMM>/<TABLE_NAME>.jsonl'
+
+-- 3. Record count for verification
+SELECT
+  '<TABLE_NAME>' AS table_name,
+  COUNT(*) AS record_count,
+  NOW() AS backed_up_at
+FROM public.<TABLE_NAME>;
+
+-- 4. RLS policies backup
+-- pg_dump "$DATABASE_URL" --schema-only --section=post-data > ./backups/<YYYYMMDD-HHMM>/policies.sql

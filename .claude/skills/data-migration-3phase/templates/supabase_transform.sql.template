@@ -1,0 +1,51 @@
+-- Supabase Phase 2 Transform Template
+-- Usage: psql "$DATABASE_URL" -f supabase_transform.sql
+-- IMPORTANT: Wrap in transaction for dry-run (BEGIN; ... ROLLBACK;)
+
+BEGIN;
+
+-- === 1. Pre-check: record count before ===
+SELECT 'BEFORE' AS phase, COUNT(*) FROM public.<SOURCE_TABLE>;
+
+-- === 2. Transform in batches ===
+-- Example: add new column, migrate old data, clean nulls
+DO $$
+DECLARE
+  batch_size INT := 500;
+  offset_val INT := 0;
+  total_rows INT;
+BEGIN
+  SELECT COUNT(*) INTO total_rows FROM public.<SOURCE_TABLE>;
+
+  WHILE offset_val < total_rows LOOP
+    UPDATE public.<TARGET_TABLE> t
+    SET
+      new_column = COALESCE(s.old_column, 'DEFAULT'),
+      migrated_at = NOW()
+    FROM (
+      SELECT id, old_column
+      FROM public.<SOURCE_TABLE>
+      ORDER BY id
+      LIMIT batch_size OFFSET offset_val
+    ) s
+    WHERE t.id = s.id;
+
+    RAISE NOTICE '[Phase2] Transformed % / % rows', offset_val + batch_size, total_rows;
+    offset_val := offset_val + batch_size;
+  END LOOP;
+END $$;
+
+-- === 3. Cleansing rules ===
+-- Trim whitespace
+UPDATE public.<TARGET_TABLE> SET name = TRIM(name) WHERE name IS NOT NULL;
+
+-- Normalize nulls
+UPDATE public.<TARGET_TABLE> SET email = NULL WHERE email = '';
+
+-- === 4. Post-check ===
+SELECT 'AFTER' AS phase, COUNT(*) FROM public.<TARGET_TABLE>;
+
+-- === 5. Commit or Rollback ===
+-- For dry-run: ROLLBACK;
+-- For real run: COMMIT;
+COMMIT;

@@ -1,0 +1,34 @@
+-- Phase 3 Verification Template (SQL)
+
+-- === 1. Record count match ===
+SELECT
+  (SELECT COUNT(*) FROM public.<SOURCE_TABLE>) AS source_count,
+  (SELECT COUNT(*) FROM public.<TARGET_TABLE>) AS target_count,
+  (SELECT COUNT(*) FROM public.<SOURCE_TABLE>)
+    - (SELECT COUNT(*) FROM public.<TARGET_TABLE>) AS diff;
+
+-- === 2. Null / constraint violations ===
+SELECT 'NOT NULL violations' AS check_name, COUNT(*) AS count
+FROM public.<TARGET_TABLE>
+WHERE <REQUIRED_COLUMN> IS NULL;
+
+SELECT 'Unique violations (should be 0)' AS check_name, COUNT(*) - COUNT(DISTINCT <UNIQUE_COLUMN>) AS count
+FROM public.<TARGET_TABLE>;
+
+-- === 3. Foreign key integrity ===
+SELECT 'Orphan records' AS check_name, COUNT(*) AS count
+FROM public.<CHILD_TABLE> c
+LEFT JOIN public.<PARENT_TABLE> p ON c.parent_id = p.id
+WHERE p.id IS NULL;
+
+-- === 4. Date range sanity ===
+SELECT
+  MIN(created_at) AS earliest,
+  MAX(created_at) AS latest
+FROM public.<TARGET_TABLE>;
+
+-- === 5. Sample comparison (pick 50 random IDs for manual inspection) ===
+SELECT *
+FROM public.<TARGET_TABLE>
+ORDER BY RANDOM()
+LIMIT 50;

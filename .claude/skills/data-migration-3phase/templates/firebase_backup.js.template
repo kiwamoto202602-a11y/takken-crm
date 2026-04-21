@@ -1,0 +1,53 @@
+// Firebase Phase 1 Backup Template
+// Usage: node firebase_backup.js
+// Prerequisites: firebase-admin SDK, service account JSON
+
+const admin = require('firebase-admin');
+const fs = require('fs');
+const path = require('path');
+
+const serviceAccount = require('./service-account.json');
+admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+
+const db = admin.firestore();
+
+// === CONFIG ===
+const COLLECTIONS = ['<COLLECTION_1>', '<COLLECTION_2>']; // replace
+const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 15);
+const BACKUP_DIR = `./backups/${timestamp}`;
+// ==============
+
+async function backupCollection(collectionName) {
+  const snapshot = await db.collection(collectionName).get();
+  const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+  fs.mkdirSync(BACKUP_DIR, { recursive: true });
+  const outPath = path.join(BACKUP_DIR, `${collectionName}.jsonl`);
+  const stream = fs.createWriteStream(outPath);
+  docs.forEach(doc => stream.write(JSON.stringify(doc) + '\n'));
+  stream.end();
+
+  console.log(`[Phase1] ${collectionName}: ${docs.length} docs -> ${outPath}`);
+  return { collection: collectionName, count: docs.length, path: outPath };
+}
+
+async function main() {
+  const results = [];
+  for (const col of COLLECTIONS) {
+    try {
+      results.push(await backupCollection(col));
+    } catch (e) {
+      console.error(`[Phase1] FAILED: ${col}`, e.message);
+      process.exit(1);
+    }
+  }
+
+  // Save manifest for verification
+  fs.writeFileSync(
+    path.join(BACKUP_DIR, 'manifest.json'),
+    JSON.stringify({ backed_up_at: new Date().toISOString(), results }, null, 2)
+  );
+  console.log(`[Phase1] Done. Manifest: ${BACKUP_DIR}/manifest.json`);
+}
+
+main();

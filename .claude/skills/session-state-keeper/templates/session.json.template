@@ -1,0 +1,23 @@
+{
+  "task_id": "<TASK_ID>",
+  "task_type": "<feature_development|bugfix|migration|refactor|other>",
+  "description": "<一行で何をやっているか>",
+  "created_at": "<ISO8601>",
+  "updated_at": "<ISO8601>",
+  "last_saved_reason": "<init|step_completed|time_elapsed|error|pre_response>",
+  "status": "in_progress",
+
+  "steps": [],
+
+  "context": {
+    "files_touched": [],
+    "open_questions": [],
+    "decisions_made": []
+  },
+
+  "errors": [],
+
+  "next_actions": [],
+
+  "resume_hint": ""
+}

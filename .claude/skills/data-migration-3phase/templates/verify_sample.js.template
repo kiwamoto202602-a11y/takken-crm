@@ -1,0 +1,116 @@
+// Phase 3 Verification Template (JS)
+// Compares source backup JSONL vs target DB, reports mismatches
+
+const fs = require('fs');
+const readline = require('readline');
+const { createClient } = require('@supabase/supabase-js');
+
+const BACKUP_DIR = process.env.BACKUP_DIR || './backups/latest';
+const SOURCE_FILE = `${BACKUP_DIR}/<COLLECTION>.jsonl`;
+const TARGET_TABLE = '<target_table>';
+
+// === Dynamic sample sizing ===
+// max(50, total * 5%), capped at 500. Full comparison for <= 100 records.
+function calcSampleSize(total) {
+  if (total <= 100) return total;
+  return Math.min(500, Math.max(50, Math.ceil(total * 0.05)));
+}
+
+// === Config ===
+const STRICT_NULL = false; // false: NULL == "" treated as equal
+const TS_TOLERANCE_MS = 1000;
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+
+async function main() {
+  // 1. Load source
+  const sourceRecords = [];
+  const rl = readline.createInterface({ input: fs.createReadStream(SOURCE_FILE) });
+  for await (const line of rl) {
+    if (line.trim()) sourceRecords.push(JSON.parse(line));
+  }
+
+  // 2. Count match
+  const { count: targetCount, error } = await supabase
+    .from(TARGET_TABLE)
+    .select('*', { count: 'exact', head: true });
+  if (error) throw error;
+
+  console.log(`[Phase3] source=${sourceRecords.length}, target=${targetCount}, diff=${sourceRecords.length - targetCount}`);
+
+  // 3. Sample comparison (dynamic size)
+  const sampleSize = calcSampleSize(sourceRecords.length);
+  const sampled = shuffle(sourceRecords).slice(0, sampleSize);
+  const mismatches = [];
+
+  for (const src of sampled) {
+    const { data: tgt, error: e } = await supabase
+      .from(TARGET_TABLE)
+      .select('*')
+      .eq('id', src.id)
+      .single();
+
+    if (e || !tgt) {
+      mismatches.push({ id: src.id, reason: 'NOT FOUND in target' });
+      continue;
+    }
+
+    const mismatch = compareFields(src, tgt, ['name', 'email']);
+    if (mismatch) mismatches.push({ id: src.id, ...mismatch });
+  }
+
+  // 4. Report
+  const report = {
+    verified_at: new Date().toISOString(),
+    source_count: sourceRecords.length,
+    target_count: targetCount,
+    sample_size: sampleSize,
+    mismatches,
+    status: mismatches.length === 0 && sourceRecords.length === targetCount ? 'PASS' : 'FAIL',
+  };
+
+  fs.writeFileSync(`${BACKUP_DIR}/phase3_report.json`, JSON.stringify(report, null, 2));
+  console.log(`[Phase3] ${report.status}: sample=${sampleSize}, mismatches=${mismatches.length}`);
+
+  if (report.status === 'FAIL') {
+    console.error('[Phase3] Integrity check FAILED. Invoke systematic-debugging with this report.');
+    process.exit(2);
+  }
+}
+
+// Equal under our relaxed rules (trim, null<->"", timestamp tolerance)
+function isEqualRelaxed(a, b) {
+  // Null/empty equivalence
+  const aEmpty = a === null || a === undefined || a === '';
+  const bEmpty = b === null || b === undefined || b === '';
+  if (aEmpty && bEmpty) return !STRICT_NULL;
+  if (aEmpty !== bEmpty) return false;
+
+  // Timestamp tolerance
+  const aDate = Date.parse(a);
+  const bDate = Date.parse(b);
+  if (!isNaN(aDate) && !isNaN(bDate)) {
+    return Math.abs(aDate - bDate) <= TS_TOLERANCE_MS;
+  }
+
+  // Trim string compare
+  return String(a).trim() === String(b).trim();
+}
+
+function compareFields(src, tgt, fields) {
+  for (const f of fields) {
+    if (!isEqualRelaxed(src[f], tgt[f])) {
+      return { field: f, source: src[f], target: tgt[f] };
+    }
+  }
+  return null;
+}
+
+function shuffle(arr) {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
+
+main().catch(e => {
+  console.error('[Phase3] FAILED:', e);
+  process.exit(1);
+});

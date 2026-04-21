@@ -1,0 +1,81 @@
+// Firebase -> Supabase Phase 2 Transform Template
+// Usage: node firebase_to_supabase.js [--dry-run]
+// Reads JSONL from Phase 1 backup, transforms, inserts into Supabase
+
+const fs = require('fs');
+const readline = require('readline');
+const { createClient } = require('@supabase/supabase-js');
+
+const DRY_RUN = process.argv.includes('--dry-run');
+const BACKUP_DIR = process.env.BACKUP_DIR || './backups/latest';
+const SOURCE_FILE = `${BACKUP_DIR}/<COLLECTION>.jsonl`;
+const TARGET_TABLE = '<target_table>';
+const BATCH_SIZE = 500;
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+
+// === Transform rule: Firestore doc -> Supabase row ===
+function transform(doc) {
+  return {
+    id: doc.id,
+    name: (doc.name || '').trim(),
+    email: doc.email || null,
+    // Firestore Timestamp -> ISO string
+    created_at: doc.createdAt?._seconds
+      ? new Date(doc.createdAt._seconds * 1000).toISOString()
+      : null,
+    // Flatten nested object
+    address_city: doc.address?.city || null,
+    address_zip: doc.address?.zip || null,
+    migrated_at: new Date().toISOString(),
+  };
+}
+
+async function main() {
+  const rl = readline.createInterface({ input: fs.createReadStream(SOURCE_FILE) });
+  let batch = [];
+  let total = 0;
+  let failed = [];
+
+  for await (const line of rl) {
+    if (!line.trim()) continue;
+    try {
+      const doc = JSON.parse(line);
+      batch.push(transform(doc));
+    } catch (e) {
+      failed.push({ line: total, error: e.message });
+      continue;
+    }
+
+    if (batch.length >= BATCH_SIZE) {
+      await flush(batch, total);
+      total += batch.length;
+      batch = [];
+    }
+  }
+  if (batch.length) {
+    await flush(batch, total);
+    total += batch.length;
+  }
+
+  console.log(`[Phase2] Done. Total: ${total}, Failed: ${failed.length}, DryRun: ${DRY_RUN}`);
+  if (failed.length) {
+    fs.writeFileSync(`${BACKUP_DIR}/phase2_errors.json`, JSON.stringify(failed, null, 2));
+  }
+}
+
+async function flush(rows, prevTotal) {
+  console.log(`[Phase2] Inserting ${rows.length} rows (total so far: ${prevTotal})${DRY_RUN ? ' [DRY-RUN]' : ''}`);
+  if (DRY_RUN) return;
+
+  const { error } = await supabase.from(TARGET_TABLE).upsert(rows);
+  if (error) {
+    console.error('[Phase2] Insert failed:', error);
+    throw error;
+  }
+}
+
+main().catch(e => {
+  console.error('[Phase2] FAILED:', e);
+  process.exit(1);
+});
