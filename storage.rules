@@ -1,0 +1,10 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // deals/{dealId}/ 以下のファイルは認証済みユーザーのみ許可
+    match /deals/{dealId}/{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
