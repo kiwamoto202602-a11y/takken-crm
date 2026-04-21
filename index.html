@@ -220,7 +220,7 @@ select.fs{padding:7px 9px;border:1px solid var(--border);border-radius:var(--rs)
   .kpi .kv{font-size:20px;}
 
   /* Dashboard 2-col → 1-col */
-  #view-dashboard > div[style*="grid-template-columns:1fr 1fr"]{display:flex!important;flex-direction:column!important;gap:10px!important;}
+  .dash-grid{display:flex!important;flex-direction:column!important;gap:10px!important;}
 
   /* Kanban: smaller cards, horizontal scroll hint */
   .kanban-wrap{padding-bottom:12px;-webkit-overflow-scrolling:touch;}
@@ -245,6 +245,7 @@ select.fs{padding:7px 9px;border:1px solid var(--border);border-radius:var(--rs)
   #dp .dp-inner{width:100%;max-width:100%;height:100dvh;border-radius:0;}
   #dp .dp-hd h2{font-size:13px;}
   .dp-tab{font-size:11px;padding:8px 2px;}
+  #edp .edp-inner{width:100%;max-width:100%;max-height:100dvh;border-radius:0;}
 
   /* Modals: bottom sheet */
   .modal-ov{align-items:flex-end;}
@@ -350,7 +351,7 @@ select.fs{padding:7px 9px;border:1px solid var(--border);border-radius:var(--rs)
           <div class="kpi warn"><div class="kl">未完了タスク</div><div class="kv" id="kTask">0</div><div class="ks">期限切れ含む</div></div>
           <div class="kpi danger"><div class="kl">今月の成約</div><div class="kv" id="kClosed">0</div><div class="ks">成約済み</div></div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+        <div class="dash-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
           <div class="today-tasks" id="todayTasksBox">
             <h3>今日のタスク・期限切れ</h3>
             <div id="todayTasksList"><div class="empty" style="padding:12px;">タスクはありません</div></div>
@@ -840,9 +841,10 @@ function renderDeals() {
       const c = customers.find(x => x.id===d.customer_id);
       const p = properties.find(x => x.id===d.property_id);
       return `<tr onclick="openDP('${d.id}')" style="cursor:pointer;">
-        <td>${c?c.sei+' '+c.mei:'—'}</td><td class="t2">${p?.name||'—'}</td>
-        <td><span class="badge ${STAGE_COLORS[d.stage]||'bg-gray'}">${d.stage}</span></td>
-        <td class="t2">${(d.created_at||'').slice(0,10)}</td>
+        <td data-label="顧客">${c?c.sei+' '+c.mei:'—'}</td>
+        <td data-label="物件" class="t2">${p?.name||'—'}</td>
+        <td data-label="結果"><span class="badge ${STAGE_COLORS[d.stage]||'bg-gray'}">${d.stage}</span></td>
+        <td data-label="更新日" class="t2">${(d.created_at||'').slice(0,10)}</td>
       </tr>`;
     }).join('') : '<tr><td colspan="4" class="empty">該当なし</td></tr>';
     return;
