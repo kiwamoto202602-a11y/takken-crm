@@ -666,7 +666,7 @@ let currentDealId=null, currentDPTab='info';
 // ============================================================
 // FIRESTORE HELPERS
 // ============================================================
-const NO_ORDER_COLS = ['deal_checklist'];
+const NO_ORDER_COLS = ['deal_checklist','deal_files'];
 
 async function dbGet(col, q={}) {
   let query = db.collection(col);
@@ -713,11 +713,7 @@ async function doLogin() {
   const msg = document.getElementById('loginMsg');
   msg.textContent = 'ログイン中…';
   try {
-    const cred = await auth.signInWithEmailAndPassword(email, pass);
-    document.getElementById('sfUser').textContent = cred.user.displayName || email;
-    document.getElementById('loginView').style.display = 'none';
-    document.getElementById('appShell').style.display = '';
-    loadAll(); nav('dashboard');
+    await auth.signInWithEmailAndPassword(email, pass);
   } catch(e) {
     msg.textContent = 'メールアドレスまたはパスワードが正しくありません';
   }
