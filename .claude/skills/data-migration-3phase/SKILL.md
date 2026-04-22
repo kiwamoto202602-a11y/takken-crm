@@ -1,6 +1,18 @@
 ---
 name: data-migration-3phase
-description: データ移行を「バックアップ → 変換 → 検証」の3フェーズで安全に実行するスキル。auto-compactで中断されても`.claude/migration.json`から再開できる。以下の状況では必ずこのスキルを使うこと — 明示的な「移行」という語がなくても発動する：(1) 既存テーブルへのカラム追加・型変更・リネーム・削除、(2) 「古い◯◯を新しい◯◯に統合」「_old/_test/_draftテーブルの整理」「試作ファイルを本番に寄せる」、(3) 大量レコードのUPDATE/DELETE/INSERTを一括実行する場面、(4) Firebase/Firestore ↔ Supabase/Postgres間のデータ移し替え、(5) Plan A → Plan B等のクライアント移管、(6) 「データを入れ直す」「リストアする」「テーブル構造を変えたい」「スキーマを直したい」「クレンジングしたい」「正規化したい」といった発言、(7) 稼働中アプリ（KAKUZEN、takken-crm、consulting-v2等）のDB構造に触る作業全般。バックアップやロールバックが必要かユーザーが明示していなくても、破壊的なDB操作に該当する場合は先回りでこのスキルを提案すること。git-guardrailsと連携してPhase 2前にバックアップブランチを作成し、systematic-debuggingと連携してPhase 3で不整合を検出した際は自動でデバッグフローに移行する。
+description: |
+  TRIGGER（以下の語を含む発話で必ず発動）:
+  - "カラム追加" "カラム削除" "カラム変更" "カラムリネーム"
+  - "スキーマ変更" "テーブル構造" "テーブル統合"
+  - "データ移行" "データ移管" "リストア" "マイグレーション"
+  - "_old" "_test" "_draft" "_backup" テーブルの整理
+  - "Firebase→Supabase" "Firestore→Postgres" 移行
+  - ALTER TABLE / TRUNCATE / 大量UPDATE・DELETE
+  SKIP:
+  - 読み取り専用SELECTのみ
+  - UI変更のみ（DBに触らない）
+  - 1〜2件の手動UPDATE
+  動作: 3フェーズ（Phase1バックアップ→Phase2変換→Phase3検証）で安全に実行。git-guardrails/systematic-debuggingと自動連携。
 ---
 
 # data-migration-3phase

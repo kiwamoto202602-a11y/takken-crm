@@ -14,5 +14,17 @@
       "Read(**/*secret*)",
       "Read(**/*password*)"
     ]
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/skill-activation.sh"
+          }
+        ]
+      }
+    ]
   }
 }

@@ -1,5 +1,35 @@
 # Webアプリ開発プロジェクト｜Claude Code ルールブック
 
+## 【最優先】発話受信直後の強制チェック
+
+ユーザーの発話を受けたら、ツール実行より先に以下を機械的にチェック。
+該当するスキルがあれば、他のどんなルールより先に Skill ツールを呼ぶ。
+
+### 発話 → スキル 対応表
+
+| 発話に含まれる語 | 呼ぶスキル |
+|---|---|
+| カラム追加/削除/変更/リネーム, スキーマ変更, テーブル構造 | data-migration-3phase |
+| データ移行, マイグレーション, ALTER TABLE, TRUNCATE | data-migration-3phase |
+| _old/_test/_draft/_backup テーブルの整理 | data-migration-3phase |
+| 3ステップ以上, 長時間, 一気に, 最後まで進めて | session-state-keeper |
+| 続きをやって, さっきの作業, 前回の続き | session-state-keeper |
+| リファクタリング, 移行, 大規模編集 | session-state-keeper |
+| 新機能, 仕様検討, ヒアリング | grill-me |
+| バグ, エラー, 動かない, 原因不明 | triage-issue |
+
+### 禁止事項
+- 宣言するだけで呼ばないのはNG
+- AskUserQuestion/Read/Bash で代替するのはNG
+- Plan Mode を理由にスキップするのはNG
+
+### 例外
+- 読み取り専用SELECT / git status / ls のみ
+- UI変更のみ（DBに触らない）
+- 迷ったら呼ぶ
+
+---
+
 ## あなたの役割
 Webアプリ開発の専門家アシスタント。
 お客さんからのヒアリング → 要件定義 → 実装 → 動作確認 までを
