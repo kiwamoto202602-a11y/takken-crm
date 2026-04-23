@@ -1,4 +1,4 @@
-# takken-crm プロジェクト設定
+﻿# takken-crm プロジェクト設定
 
 
 
@@ -10,21 +10,21 @@
 
 |---|---|
 
-| `{{PROJECT\_NAME}}` | 宅建CRM |
+| `{{PROJECT_NAME}}` | 宅建CRM |
 
-| `{{CLIENT\_NAME}}` | (クライアント名未設定) |
+| `{{CLIENT_NAME}}` | (クライアント名未設定) |
 
-| `{{DB\_STACK}}` | Firebase |
+| `{{DB_STACK}}` | Firebase |
 
-| `{{REPO\_NAME}}` | takken-crm |
+| `{{REPO_NAME}}` | takken-crm |
 
-| `{{GHPAGES\_URL}}` | https://kiwamoto202602-a11y.github.io/takken-crm |
+| `{{GHPAGES_URL}}` | https://kiwamoto202602-a11y.github.io/takken-crm |
 
-| `{{FIREBASE\_PROJECT\_ID}}` | (記入) |
+| `{{FIREBASE_PROJECT_ID}}` | (記入) |
 
-| `{{SUPABASE\_PROJECT\_REF}}` | (Firebase使用のため該当なし) |
+| `{{SUPABASE_PROJECT_REF}}` | (Firebase使用のため該当なし) |
 
-| `{{MONTHLY\_PLAN}}` | (記入) |
+| `{{MONTHLY_PLAN}}` | (記入) |
 
 
 
@@ -34,13 +34,13 @@
 
 ### 技術スタック
 
-\- \*\*DB\*\*: Firebase Firestore
+- **DB**: Firebase Firestore
 
-\- \*\*認証\*\*: Firebase Auth
+- **認証**: Firebase Auth
 
-\- \*\*ファイル保存\*\*: Firebase Storage
+- **ファイル保存**: Firebase Storage
 
-\- \*\*公開\*\*: GitHub Pages
+- **公開**: GitHub Pages
 
 
 
@@ -64,15 +64,15 @@
 
 ### 宅建業務特有の考慮事項
 
-\- 法令遵守(宅建業法)に関する機能を含む
+- 法令遵守(宅建業法)に関する機能を含む
 
-\- 媒介契約の種類・期限・報告義務等の管理
+- 媒介契約の種類・期限・報告義務等の管理
 
 
 
 ### 開発状況
 
-\- index.html ベースの単一ファイル構成
+- index.html ベースの単一ファイル構成
 
 
 
